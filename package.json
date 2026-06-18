@@ -16,13 +16,14 @@
     "prepublishOnly": "npm run package"
   },
   "devDependencies": {
+    "@playwright/test": "^1",
     "@sveltejs/adapter-auto": "^7",
     "@sveltejs/kit": "^2",
     "@sveltejs/package": "^2",
     "@sveltejs/vite-plugin-svelte": "^7",
     "@testing-library/jest-dom": "^6",
     "@testing-library/svelte": "^5",
-    "@playwright/test": "^1",
+    "@types/node": "^25.9.3",
     "fuse.js": "^6.6.2",
     "jsdom": "^29",
     "prettier": "^3",

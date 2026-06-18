@@ -18,8 +18,14 @@
 <Select {items} bind:value multiple>
     {#snippet list(filteredItems)}
         <div>
-            {#each filteredItems as item }
-                <span onclick={() => handleClick(item)}>{item.label}</span>
+            {#each filteredItems as item}
+                <span
+                    role="button"
+                    tabindex="0"
+                    onclick={() => handleClick(item)}
+                    onkeydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') handleClick(item);
+                    }}>{item.label}</span>
             {/each}
         </div>
     {/snippet}
