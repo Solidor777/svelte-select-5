@@ -1,8 +1,15 @@
 {
-  "name": "svelte-select",
+  "name": "@solidor777/svelte-select-5",
   "version": "6.0.0",
-  "repository": "https://rob-balfre@github.com/rob-balfre/svelte-select.git",
-  "description": "A <Select> component for Svelte apps",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Solidor777/svelte-select-5.git"
+  },
+  "homepage": "https://github.com/Solidor777/svelte-select-5#readme",
+  "bugs": {
+    "url": "https://github.com/Solidor777/svelte-select-5/issues"
+  },
+  "description": "A Svelte 5 <Select> component (autocomplete/typeahead) with runes and CSS tokens. Fork of svelte-select.",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -38,9 +45,18 @@
   "author": "Robert Balfré <rob.balfre@gmail.com> (https://github.com/rob-balfre)",
   "license": "ISC",
   "keywords": [
-    "svelte"
+    "svelte",
+    "svelte5",
+    "select",
+    "autocomplete",
+    "typeahead",
+    "multiselect",
+    "component"
   ],
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist"
   ],
