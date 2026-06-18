@@ -15,11 +15,9 @@
 
 ## Demos
 
-[💥 Examples of every prop, event, slot and more 💥](https://svelte-select-examples.vercel.app)
-
-[✨ REPL: Simple ✨](https://svelte.dev/repl/c3bbe052fdfc4e87a46ccd9091ee002b)
-
-[💃 REPL: Show me everything 🕺](https://svelte.dev/repl/3df87e32340e4e9e85bf371becae2af0)
+Run the example site locally with `npm run dev` — every prop, event, snippet and
+more lives under `src/routes/examples`, including a [Simple](src/routes/examples/advanced/simple/+page.svelte)
+and a [Show everything](src/routes/examples/advanced/show-everything/+page.svelte) example.
 
 ## Installation
 
@@ -346,6 +344,15 @@ The component's styles are token-driven, so most theming is done via the
 the component's class names (`.svelte-select`, `.svelte-select-list`, `.item`,
 `.multi-item`, …) with your own global CSS.
 
+
+## Credits
+
+`svelte-select` was created by [Robert Balfré](https://github.com/rob-balfre).
+Source and full history: [rob-balfre/svelte-select](https://github.com/rob-balfre/svelte-select).
+
+This Svelte 5 release (v6) is a fork maintained at
+[Solidor777/svelte-select-5](https://github.com/Solidor777/svelte-select-5),
+building on Robert's original work.
 
 ## License
 
