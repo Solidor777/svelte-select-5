@@ -1,53 +1,51 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const { find } = require("find-in-files");
+const TOKENS_FILE = path.join(__dirname, '..', 'src', 'lib', 'styles', 'tokens.css');
+const DOC_FILE = path.join(__dirname, 'theming_variables.md');
+const SECTION = /<!-- List start -->[\s\S]*<!-- List end -->/;
 
-const VARIABLE_USAGE_PATTERN = "var\\(--([A-Za-z\\-_]*)";
-const SOURCE_FOLDER = path.join(__dirname, "..", "src/lib");
+const css = fs.readFileSync(TOKENS_FILE, 'utf8');
 
-const DOC_FILE_PATH = path.join(__dirname, "theming_variables.md");
-const VARIABLE_SECTION_PATTERN = /(<!-- List start -->)(.|\n)*(<!-- List end -->)/gm;
+// Declared --svelte-select-* custom properties (the public token API).
+const tokens = [...new Set([...css.matchAll(/^\s*(--svelte-select-[a-z0-9-]+)\s*:/gim)].map((m) => m[1]))].sort();
 
-(async () => {
-  const searchResults = await find(
-    VARIABLE_USAGE_PATTERN,
-    SOURCE_FOLDER,
-    ".svelte"
-  );
-  const justTheMatchedParts = Object.keys(searchResults).reduce(
-    (accumulator, nextKey) => [
-      ...accumulator,
-      ...searchResults[nextKey].matches
-    ],
-    []
-  );
-  const uniqueMatches = [...new Set(justTheMatchedParts).values()];
-  uniqueMatches.sort();
-  const matchesAsMarkdownListItems = uniqueMatches.map(b =>
-    b.replace(/var\((--[A-Za-z\-_]*)/, "- `$1`")
-  );
+// Legacy vars consumed as the first argument of var(--legacy, …); these are the
+// deprecated flat variables still honored for back-compat.
+const legacy = [
+    ...new Set(
+        [...css.matchAll(/var\(\s*(--[a-z0-9-]+)\s*,/gim)]
+            .map((m) => m[1])
+            .filter((v) => !v.startsWith('--svelte-select-'))
+    ),
+].sort();
 
-  const START_TAG_CAPTURE_GROUP = "$1";
-  const END_TAG_CAPTURE_GROUP = "$3";
-  const newDependencySectionAsRegexReplaceExpression = [
-    START_TAG_CAPTURE_GROUP,
-    ...matchesAsMarkdownListItems,
-    END_TAG_CAPTURE_GROUP
-  ].join("\n");
-  const oldContent = fs.readFileSync(DOC_FILE_PATH).toString();
-  const oldFileDoesNotContainSection =
-    oldContent.search(VARIABLE_SECTION_PATTERN) === -1;
-  if (oldFileDoesNotContainSection) {
-    console.error(`Could not find variable section in ${DOC_FILE_PATH}`);
+const lines = [
+    '## Tokens (`--svelte-select-*`)',
+    '',
+    'Override these to theme the component. Tier 1 primitives (colors, radius, sizes)',
+    'retheme everything at once; the remaining tokens target individual parts.',
+    '',
+    ...tokens.map((t) => `- \`${t}\``),
+    '',
+    '## Dark theme',
+    '',
+    'Set `data-theme="dark"` on the `.svelte-select` element or any ancestor.',
+    '',
+    '## Deprecated legacy variables',
+    '',
+    'Still honored (mapped onto the tokens above) but deprecated — prefer the',
+    '`--svelte-select-*` tokens. Slated for removal in a future major.',
+    '',
+    ...legacy.map((t) => `- \`${t}\``),
+];
+
+const oldContent = fs.readFileSync(DOC_FILE, 'utf8');
+if (!SECTION.test(oldContent)) {
+    console.error(`Could not find list markers in ${DOC_FILE}`);
     process.exit(1);
-  }
-  fs.writeFileSync(
-    DOC_FILE_PATH,
-    oldContent.replace(
-      VARIABLE_SECTION_PATTERN,
-      newDependencySectionAsRegexReplaceExpression
-    )
-  );
-  console.log(`Successfully wrote to ${DOC_FILE_PATH}`);
-})();
+}
+
+const replacement = ['<!-- List start -->', ...lines, '<!-- List end -->'].join('\n');
+fs.writeFileSync(DOC_FILE, oldContent.replace(SECTION, replacement));
+console.log(`Wrote ${tokens.length} tokens and ${legacy.length} deprecated vars to ${DOC_FILE}`);

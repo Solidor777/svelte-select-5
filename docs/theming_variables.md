@@ -3,6 +3,148 @@
 Override the following CSS custom properties (variables) to style svelte-select components.
 
 <!-- List start -->
+## Tokens (`--svelte-select-*`)
+
+Override these to theme the component. Tier 1 primitives (colors, radius, sizes)
+retheme everything at once; the remaining tokens target individual parts.
+
+- `--svelte-select-accent`
+- `--svelte-select-accent-pressed`
+- `--svelte-select-accent-subtle`
+- `--svelte-select-accent-text`
+- `--svelte-select-bg`
+- `--svelte-select-border-color`
+- `--svelte-select-border-color-focused`
+- `--svelte-select-border-color-hover`
+- `--svelte-select-box-sizing`
+- `--svelte-select-chevron-background`
+- `--svelte-select-chevron-border`
+- `--svelte-select-chevron-color`
+- `--svelte-select-chevron-height`
+- `--svelte-select-chevron-icon-colour`
+- `--svelte-select-chevron-icon-width`
+- `--svelte-select-chevron-pointer-events`
+- `--svelte-select-chevron-width`
+- `--svelte-select-chip-active-outline`
+- `--svelte-select-chip-bg`
+- `--svelte-select-chip-clear-color`
+- `--svelte-select-chip-color`
+- `--svelte-select-chip-disabled-bg`
+- `--svelte-select-chip-disabled-color`
+- `--svelte-select-chip-gap`
+- `--svelte-select-chip-height`
+- `--svelte-select-chip-margin`
+- `--svelte-select-chip-max-width`
+- `--svelte-select-chip-outline`
+- `--svelte-select-chip-padding`
+- `--svelte-select-chip-radius`
+- `--svelte-select-clear-color`
+- `--svelte-select-clear-focus-outline`
+- `--svelte-select-clear-height`
+- `--svelte-select-clear-icon-color`
+- `--svelte-select-clear-icon-width`
+- `--svelte-select-clear-margin`
+- `--svelte-select-clear-width`
+- `--svelte-select-control-bg`
+- `--svelte-select-control-border`
+- `--svelte-select-control-border-focused`
+- `--svelte-select-control-border-hover`
+- `--svelte-select-control-font-size`
+- `--svelte-select-control-margin`
+- `--svelte-select-control-max-height`
+- `--svelte-select-control-min-height`
+- `--svelte-select-control-padding`
+- `--svelte-select-control-radius`
+- `--svelte-select-control-radius-focused`
+- `--svelte-select-control-width`
+- `--svelte-select-danger`
+- `--svelte-select-disabled-background`
+- `--svelte-select-disabled-bg`
+- `--svelte-select-disabled-border-color`
+- `--svelte-select-disabled-color`
+- `--svelte-select-disabled-placeholder-color`
+- `--svelte-select-disabled-placeholder-opacity`
+- `--svelte-select-disabled-text`
+- `--svelte-select-error-bg`
+- `--svelte-select-error-border`
+- `--svelte-select-font-size`
+- `--svelte-select-group-item-padding-left`
+- `--svelte-select-group-title-border-color`
+- `--svelte-select-group-title-border-style`
+- `--svelte-select-group-title-border-width`
+- `--svelte-select-group-title-color`
+- `--svelte-select-group-title-font-size`
+- `--svelte-select-group-title-font-weight`
+- `--svelte-select-group-title-padding`
+- `--svelte-select-group-title-text-transform`
+- `--svelte-select-height`
+- `--svelte-select-icon-color`
+- `--svelte-select-indicators-bottom`
+- `--svelte-select-indicators-position`
+- `--svelte-select-indicators-right`
+- `--svelte-select-indicators-top`
+- `--svelte-select-input-color`
+- `--svelte-select-input-letter-spacing`
+- `--svelte-select-input-margin`
+- `--svelte-select-input-padding`
+- `--svelte-select-inset`
+- `--svelte-select-internal-padding`
+- `--svelte-select-item-active-bg`
+- `--svelte-select-item-active-color`
+- `--svelte-select-item-color`
+- `--svelte-select-item-first-radius`
+- `--svelte-select-item-height`
+- `--svelte-select-item-hover-bg`
+- `--svelte-select-item-hover-color`
+- `--svelte-select-item-line-height`
+- `--svelte-select-item-not-selectable-color`
+- `--svelte-select-item-padding`
+- `--svelte-select-item-pressed-bg`
+- `--svelte-select-item-transition`
+- `--svelte-select-list-bg`
+- `--svelte-select-list-border`
+- `--svelte-select-list-empty-color`
+- `--svelte-select-list-empty-padding`
+- `--svelte-select-list-empty-text-align`
+- `--svelte-select-list-max-height`
+- `--svelte-select-list-position`
+- `--svelte-select-list-radius`
+- `--svelte-select-list-shadow`
+- `--svelte-select-list-shadow-token`
+- `--svelte-select-list-z-index`
+- `--svelte-select-loading-color`
+- `--svelte-select-loading-height`
+- `--svelte-select-loading-margin`
+- `--svelte-select-loading-width`
+- `--svelte-select-multi-input-margin`
+- `--svelte-select-multi-input-padding`
+- `--svelte-select-multi-padding`
+- `--svelte-select-muted`
+- `--svelte-select-placeholder-color`
+- `--svelte-select-placeholder-opacity`
+- `--svelte-select-radius`
+- `--svelte-select-radius-list`
+- `--svelte-select-selected-color`
+- `--svelte-select-selected-overflow`
+- `--svelte-select-selected-padding`
+- `--svelte-select-spinner-color`
+- `--svelte-select-spinner-height`
+- `--svelte-select-spinner-width`
+- `--svelte-select-surface-sunken`
+- `--svelte-select-text`
+- `--svelte-select-transition`
+- `--svelte-select-value-container-overflow`
+- `--svelte-select-value-container-padding`
+
+## Dark theme
+
+Set `data-theme="dark"` on the `.svelte-select` element or any ancestor.
+
+## Deprecated legacy variables
+
+Still honored (mapped onto the tokens above) but deprecated — prefer the
+`--svelte-select-*` tokens. Slated for removal in a future major.
+
 - `--background`
 - `--border`
 - `--border-focused`
@@ -49,7 +191,6 @@ Override the following CSS custom properties (variables) to style svelte-select 
 - `--indicators-right`
 - `--indicators-top`
 - `--input-color`
-- `--input-left`
 - `--input-letter-spacing`
 - `--input-margin`
 - `--input-padding`

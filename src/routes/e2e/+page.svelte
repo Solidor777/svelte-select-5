@@ -29,4 +29,8 @@
     <div data-test="second" style="margin-top: 320px;">
         <Select {items} />
     </div>
+
+    <div data-test="dark" data-theme="dark">
+        <Select {items} />
+    </div>
 </div>

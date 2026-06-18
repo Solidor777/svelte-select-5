@@ -26,6 +26,7 @@
     --svelte-select-danger: #ff2d55;
     --svelte-select-disabled-bg: #ebedef;
     --svelte-select-disabled-text: #c1c6cc;
+    --svelte-select-surface-sunken: #ebedef; /* multi-item chips */
     --svelte-select-muted: #78848f;
     --svelte-select-radius: 6px;
     --svelte-select-radius-list: 4px;
@@ -92,7 +93,7 @@
     --svelte-select-chevron-background: var(--chevron-background, transparent);
     --svelte-select-chevron-pointer-events: var(--chevron-pointer-events, none);
     --svelte-select-chevron-color: var(--chevron-color, var(--svelte-select-icon-color));
-    --svelte-select-chevron-border: var(--chevron-border, 0 0 0 1px solid #d8dbdf);
+    --svelte-select-chevron-border: var(--chevron-border, 0 0 0 1px solid var(--svelte-select-border-color));
     --svelte-select-chevron-icon-colour: var(--chevron-icon-colour, currentColor);
     --svelte-select-chevron-icon-width: var(--chevron-icon-width, 20px);
 
@@ -134,7 +135,7 @@
     --svelte-select-group-title-border-color: var(--group-title-border-color, color);
 
     /* ---- multi-item chip ---- */
-    --svelte-select-chip-bg: var(--multi-item-bg, #ebedef);
+    --svelte-select-chip-bg: var(--multi-item-bg, var(--svelte-select-surface-sunken));
     --svelte-select-chip-margin: var(--multi-item-margin, 0);
     --svelte-select-chip-outline: var(--multi-item-outline, 1px solid #ddd);
     --svelte-select-chip-radius: var(--multi-item-border-radius, 4px);
@@ -143,7 +144,7 @@
     --svelte-select-chip-gap: var(--multi-item-gap, 4px);
     --svelte-select-chip-max-width: var(--multi-max-width, none);
     --svelte-select-chip-color: var(--multi-item-color, var(--svelte-select-item-color));
-    --svelte-select-chip-disabled-bg: var(--multi-item-disabled-hover-bg, #ebedef);
+    --svelte-select-chip-disabled-bg: var(--multi-item-disabled-hover-bg, var(--svelte-select-surface-sunken));
     --svelte-select-chip-disabled-color: var(--multi-item-disabled-hover-color, var(--svelte-select-disabled-text));
     --svelte-select-chip-clear-color: var(--multi-item-clear-icon-color, #000);
     --svelte-select-chip-active-outline: var(--multi-item-active-outline, 1px solid #006fe8);
@@ -160,3 +161,24 @@
     --svelte-select-error-border: var(--error-border, 1px solid var(--svelte-select-danger));
     --svelte-select-error-bg: var(--error-background, var(--svelte-select-bg));
 }
+
+/*
+ * Dark theme: opt in with data-theme="dark" on the control or any ancestor.
+ * Overrides Tier 1 primitives only; every Tier 2 part token cascades from them.
+ */
+:where(.svelte-select[data-theme='dark'], [data-theme='dark'] .svelte-select) {
+    --svelte-select-bg: #26262e;
+    --svelte-select-text: #e6e6e6;
+    --svelte-select-border-color: #3a3a44;
+    --svelte-select-border-color-hover: #4a4a55;
+    --svelte-select-border-color-focused: #5b8cff;
+    --svelte-select-muted: #9a9aa2;
+    --svelte-select-accent: #3055d8;
+    --svelte-select-accent-text: #ffffff;
+    --svelte-select-accent-subtle: #32323c;
+    --svelte-select-accent-pressed: #3a3a44;
+    --svelte-select-surface-sunken: #32323c;
+    --svelte-select-disabled-bg: #2e2e36;
+    --svelte-select-disabled-text: #6a6a72;
+}
+
