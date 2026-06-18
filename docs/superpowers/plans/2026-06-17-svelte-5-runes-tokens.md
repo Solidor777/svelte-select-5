@@ -1183,7 +1183,9 @@ to be decided by the human at the handoff:
 - **Task 11** (parity suite) — verify the legacy→new test mapping drops nothing
   and that ported assertions actually exercise the original behavior.
 
-Outcome: _pending human decision at execution handoff._
+Outcome: **Approved — buddy-check Tasks 10 and 11** (independent two-reviewer
+cross-check at the review gate for each). Execution mode: inline
+(superpowers:executing-plans), batched with checkpoints.
 
 ## Self-Review Notes
 
