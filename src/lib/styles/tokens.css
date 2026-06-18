@@ -1,0 +1,109 @@
+/*
+ * Layered design tokens for svelte-select.
+ *
+ * Tier 1 — primitives: the small set of knobs to override for a full retheme.
+ * Tier 2 — semantic part tokens: every styled property reads one of these; each
+ *          resolves to a Tier 1 primitive (or a literal where a part has no
+ *          primitive). Component styles consume only Tier 2 tokens.
+ *
+ * Scoped with :where() so specificity stays 0 and consumer overrides always win.
+ * Defaults reproduce the historical hardcoded values exactly.
+ */
+:where(.svelte-select) {
+    /* ---- Tier 1: primitives ---- */
+    --svelte-select-bg: #fff;
+    --svelte-select-text: inherit;
+    --svelte-select-border-color: #d8dbdf;
+    --svelte-select-border-color-hover: #b2b8bf;
+    --svelte-select-border-color-focused: #006fe8;
+    --svelte-select-placeholder-color: #78848f;
+    --svelte-select-icon-color: var(--icons-color, currentColor);
+
+    --svelte-select-accent: #007aff; /* active item */
+    --svelte-select-accent-text: #fff;
+    --svelte-select-accent-subtle: #e7f2ff; /* hovered item */
+    --svelte-select-accent-pressed: #b9daff; /* :active item */
+    --svelte-select-danger: #ff2d55;
+
+    --svelte-select-disabled-bg: #ebedef;
+    --svelte-select-disabled-border-color: #ebedef;
+    --svelte-select-disabled-text: #c1c6cc;
+
+    --svelte-select-chip-bg: #ebedef;
+    --svelte-select-chip-outline: 1px solid #ddd;
+    --svelte-select-chip-active-outline: 1px solid #006fe8;
+
+    --svelte-select-group-title-color: #8f8f8f;
+    --svelte-select-muted: #78848f; /* empty/list muted text */
+    --svelte-select-not-selectable-color: #999;
+
+    --svelte-select-radius: 6px;
+    --svelte-select-radius-list: 4px;
+    --svelte-select-radius-item-first: 4px 4px 0 0;
+    --svelte-select-height: 42px;
+    --svelte-select-font-size: 16px;
+    --svelte-select-inset: 0 0 0 16px;
+    --svelte-select-item-padding: 0 20px;
+    --svelte-select-transition: all 0.2s;
+    --svelte-select-list-shadow: 0 2px 3px 0 rgba(44, 62, 80, 0.24);
+    --svelte-select-list-max-height: 252px;
+    --svelte-select-list-z-index: 2;
+
+    /* ---- Tier 2: semantic part tokens ---- */
+    /* control */
+    --svelte-select-control-bg: var(--svelte-select-bg);
+    --svelte-select-control-border: 1px solid var(--svelte-select-border-color);
+    --svelte-select-control-border-hover: 1px solid var(--svelte-select-border-color-hover);
+    --svelte-select-control-border-focused: 1px solid var(--svelte-select-border-color-focused);
+    --svelte-select-control-radius: var(--svelte-select-radius);
+    --svelte-select-control-min-height: var(--svelte-select-height);
+    --svelte-select-control-padding: var(--svelte-select-inset);
+    --svelte-select-control-font-size: var(--svelte-select-font-size);
+
+    /* input + value */
+    --svelte-select-input-color: var(--svelte-select-text);
+    --svelte-select-value-color: var(--svelte-select-text);
+    --svelte-select-placeholder: var(--svelte-select-placeholder-color);
+
+    /* list */
+    --svelte-select-list-bg: var(--svelte-select-bg);
+    --svelte-select-list-radius: var(--svelte-select-radius-list);
+    --svelte-select-list-empty-color: var(--svelte-select-muted);
+
+    /* item */
+    --svelte-select-item-color: var(--svelte-select-text);
+    --svelte-select-item-padding-x: var(--svelte-select-item-padding);
+    --svelte-select-item-height: var(--svelte-select-height);
+    --svelte-select-item-transition: var(--svelte-select-transition);
+    --svelte-select-item-first-radius: var(--svelte-select-radius-item-first);
+    --svelte-select-item-hover-bg: var(--svelte-select-accent-subtle);
+    --svelte-select-item-hover-color: var(--svelte-select-text);
+    --svelte-select-item-active-bg: var(--svelte-select-accent);
+    --svelte-select-item-active-color: var(--svelte-select-accent-text);
+    --svelte-select-item-pressed-bg: var(--svelte-select-accent-pressed);
+    --svelte-select-item-not-selectable-color: var(--svelte-select-not-selectable-color);
+
+    /* group title */
+    --svelte-select-group-color: var(--svelte-select-group-title-color);
+
+    /* multi-item chip */
+    --svelte-select-chip-color: var(--svelte-select-text);
+    --svelte-select-chip-background: var(--svelte-select-chip-bg);
+    --svelte-select-chip-border: var(--svelte-select-chip-outline);
+    --svelte-select-chip-active-border: var(--svelte-select-chip-active-outline);
+    --svelte-select-chip-clear-color: #000;
+    --svelte-select-chip-disabled-bg: var(--svelte-select-disabled-bg);
+    --svelte-select-chip-disabled-color: var(--svelte-select-disabled-text);
+
+    /* indicators */
+    --svelte-select-clear-color: var(--svelte-select-icon-color);
+    --svelte-select-chevron-color: var(--svelte-select-icon-color);
+    --svelte-select-loading-color: var(--svelte-select-icon-color);
+
+    /* states */
+    --svelte-select-disabled-background: var(--svelte-select-disabled-bg);
+    --svelte-select-disabled-border: var(--svelte-select-disabled-border-color);
+    --svelte-select-disabled-color: var(--svelte-select-disabled-text);
+    --svelte-select-error-border: 1px solid var(--svelte-select-danger);
+    --svelte-select-error-bg: var(--svelte-select-bg);
+}

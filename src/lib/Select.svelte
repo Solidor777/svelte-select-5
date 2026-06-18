@@ -3,6 +3,8 @@
     import { offset, flip, shift } from 'svelte-floating-ui/dom';
     import { createFloatingActions } from 'svelte-floating-ui';
 
+    import './styles/tokens.css';
+
     import { filterItems, convertStringItemsToObjects, loadAndConvert } from './filtering.svelte.js';
     import { coerceValue, computeJustValue } from './selection.svelte.js';
 
