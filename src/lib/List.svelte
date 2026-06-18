@@ -137,14 +137,14 @@
 
 <style>
     .svelte-select-list {
-        box-shadow: var(--list-shadow, 0 2px 3px 0 rgba(44, 62, 80, 0.24));
-        border-radius: var(--list-border-radius, 4px);
-        max-height: var(--list-max-height, 252px);
+        box-shadow: var(--svelte-select-list-shadow-token);
+        border-radius: var(--svelte-select-list-radius);
+        max-height: var(--svelte-select-list-max-height);
         overflow-y: auto;
-        background: var(--list-background, #fff);
-        position: var(--list-position, absolute);
-        z-index: var(--list-z-index, 2);
-        border: var(--list-border);
+        background: var(--svelte-select-list-bg);
+        position: var(--svelte-select-list-position);
+        z-index: var(--svelte-select-list-z-index);
+        border: var(--svelte-select-list-border);
     }
 
     .prefloat {
@@ -153,8 +153,8 @@
     }
 
     .empty {
-        text-align: var(--list-empty-text-align, center);
-        padding: var(--list-empty-padding, 20px 0);
-        color: var(--list-empty-color, #78848f);
+        text-align: var(--svelte-select-list-empty-text-align);
+        padding: var(--svelte-select-list-empty-padding);
+        color: var(--svelte-select-list-empty-color);
     }
 </style>

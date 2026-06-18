@@ -48,25 +48,25 @@
 
 <style>
     .multi-item {
-        background: var(--multi-item-bg, #ebedef);
-        margin: var(--multi-item-margin, 0);
-        outline: var(--multi-item-outline, 1px solid #ddd);
-        border-radius: var(--multi-item-border-radius, 4px);
-        height: var(--multi-item-height, 25px);
-        line-height: var(--multi-item-height, 25px);
+        background: var(--svelte-select-chip-bg);
+        margin: var(--svelte-select-chip-margin);
+        outline: var(--svelte-select-chip-outline);
+        border-radius: var(--svelte-select-chip-radius);
+        height: var(--svelte-select-chip-height);
+        line-height: var(--svelte-select-chip-height);
         display: flex;
         cursor: default;
-        padding: var(--multi-item-padding, 0 5px);
+        padding: var(--svelte-select-chip-padding);
         overflow: hidden;
-        gap: var(--multi-item-gap, 4px);
+        gap: var(--svelte-select-chip-gap);
         outline-offset: -1px;
-        max-width: var(--multi-max-width, none);
-        color: var(--multi-item-color, var(--item-color));
+        max-width: var(--svelte-select-chip-max-width);
+        color: var(--svelte-select-chip-color);
     }
 
     .multi-item.disabled:hover {
-        background: var(--multi-item-disabled-hover-bg, #ebedef);
-        color: var(--multi-item-disabled-hover-color, #c1c6cc);
+        background: var(--svelte-select-chip-disabled-bg);
+        color: var(--svelte-select-chip-disabled-color);
     }
 
     .multi-item-text {
@@ -79,10 +79,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        --clear-icon-color: var(--multi-item-clear-icon-color, #000);
+        --svelte-select-clear-icon-color: var(--svelte-select-chip-clear-color);
     }
 
     .multi-item.active {
-        outline: var(--multi-item-active-outline, 1px solid #006fe8);
+        outline: var(--svelte-select-chip-active-outline);
     }
 </style>

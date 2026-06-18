@@ -2,12 +2,14 @@
  * Layered design tokens for svelte-select.
  *
  * Tier 1 — primitives: the small set of knobs to override for a full retheme.
- * Tier 2 — semantic part tokens: every styled property reads one of these; each
- *          resolves to a Tier 1 primitive (or a literal where a part has no
- *          primitive). Component styles consume only Tier 2 tokens.
+ * Tier 2 — semantic part tokens: every styled property reads one of these. Each
+ *          resolves through `var(--<legacy>, <primitive-or-literal>)`, so:
+ *            1. a legacy flat var (e.g. --item-is-active-bg) still wins if set
+ *               (deprecated; see docs/theming_variables.md),
+ *            2. otherwise a Tier 1 primitive supplies the value,
+ *            3. otherwise the historical literal default applies.
  *
  * Scoped with :where() so specificity stays 0 and consumer overrides always win.
- * Defaults reproduce the historical hardcoded values exactly.
  */
 :where(.svelte-select) {
     /* ---- Tier 1: primitives ---- */
@@ -16,94 +18,145 @@
     --svelte-select-border-color: #d8dbdf;
     --svelte-select-border-color-hover: #b2b8bf;
     --svelte-select-border-color-focused: #006fe8;
-    --svelte-select-placeholder-color: #78848f;
     --svelte-select-icon-color: var(--icons-color, currentColor);
-
-    --svelte-select-accent: #007aff; /* active item */
+    --svelte-select-accent: #007aff;
     --svelte-select-accent-text: #fff;
-    --svelte-select-accent-subtle: #e7f2ff; /* hovered item */
-    --svelte-select-accent-pressed: #b9daff; /* :active item */
+    --svelte-select-accent-subtle: #e7f2ff;
+    --svelte-select-accent-pressed: #b9daff;
     --svelte-select-danger: #ff2d55;
-
     --svelte-select-disabled-bg: #ebedef;
-    --svelte-select-disabled-border-color: #ebedef;
     --svelte-select-disabled-text: #c1c6cc;
-
-    --svelte-select-chip-bg: #ebedef;
-    --svelte-select-chip-outline: 1px solid #ddd;
-    --svelte-select-chip-active-outline: 1px solid #006fe8;
-
-    --svelte-select-group-title-color: #8f8f8f;
-    --svelte-select-muted: #78848f; /* empty/list muted text */
-    --svelte-select-not-selectable-color: #999;
-
+    --svelte-select-muted: #78848f;
     --svelte-select-radius: 6px;
     --svelte-select-radius-list: 4px;
-    --svelte-select-radius-item-first: 4px 4px 0 0;
     --svelte-select-height: 42px;
     --svelte-select-font-size: 16px;
     --svelte-select-inset: 0 0 0 16px;
-    --svelte-select-item-padding: 0 20px;
     --svelte-select-transition: all 0.2s;
     --svelte-select-list-shadow: 0 2px 3px 0 rgba(44, 62, 80, 0.24);
-    --svelte-select-list-max-height: 252px;
-    --svelte-select-list-z-index: 2;
 
-    /* ---- Tier 2: semantic part tokens ---- */
-    /* control */
-    --svelte-select-control-bg: var(--svelte-select-bg);
-    --svelte-select-control-border: 1px solid var(--svelte-select-border-color);
-    --svelte-select-control-border-hover: 1px solid var(--svelte-select-border-color-hover);
-    --svelte-select-control-border-focused: 1px solid var(--svelte-select-border-color-focused);
-    --svelte-select-control-radius: var(--svelte-select-radius);
-    --svelte-select-control-min-height: var(--svelte-select-height);
-    --svelte-select-control-padding: var(--svelte-select-inset);
-    --svelte-select-control-font-size: var(--svelte-select-font-size);
+    /* ---- Tier 2: control ---- */
+    --svelte-select-control-bg: var(--background, var(--svelte-select-bg));
+    --svelte-select-control-border: var(--border, 1px solid var(--svelte-select-border-color));
+    --svelte-select-control-border-hover: var(--border-hover, 1px solid var(--svelte-select-border-color-hover));
+    --svelte-select-control-border-focused: var(--border-focused, 1px solid var(--svelte-select-border-color-focused));
+    --svelte-select-control-radius: var(--border-radius, var(--svelte-select-radius));
+    --svelte-select-control-radius-focused: var(--border-radius-focused, var(--svelte-select-control-radius));
+    --svelte-select-control-min-height: var(--height, var(--svelte-select-height));
+    --svelte-select-control-max-height: var(--max-height, none);
+    --svelte-select-control-padding: var(--padding, var(--svelte-select-inset));
+    --svelte-select-control-margin: var(--margin, 0);
+    --svelte-select-control-width: var(--width, 100%);
+    --svelte-select-control-font-size: var(--font-size, var(--svelte-select-font-size));
+    --svelte-select-box-sizing: var(--box-sizing, border-box);
+    --svelte-select-internal-padding: var(--internal-padding, var(--svelte-select-inset));
 
-    /* input + value */
-    --svelte-select-input-color: var(--svelte-select-text);
-    --svelte-select-value-color: var(--svelte-select-text);
-    --svelte-select-placeholder: var(--svelte-select-placeholder-color);
+    /* ---- value container ---- */
+    --svelte-select-value-container-padding: var(--value-container-padding, 5px 0);
+    --svelte-select-value-container-overflow: var(--value-container-overflow, hidden);
 
-    /* list */
-    --svelte-select-list-bg: var(--svelte-select-bg);
-    --svelte-select-list-radius: var(--svelte-select-radius-list);
-    --svelte-select-list-empty-color: var(--svelte-select-muted);
+    /* ---- input ---- */
+    --svelte-select-input-color: var(--input-color, var(--svelte-select-text));
+    --svelte-select-input-padding: var(--input-padding, 0);
+    --svelte-select-input-letter-spacing: var(--input-letter-spacing, inherit);
+    --svelte-select-input-margin: var(--input-margin, 0);
+    --svelte-select-placeholder-color: var(--placeholder-color, var(--svelte-select-muted));
+    --svelte-select-placeholder-opacity: var(--placeholder-opacity, 1);
 
-    /* item */
-    --svelte-select-item-color: var(--svelte-select-text);
-    --svelte-select-item-padding-x: var(--svelte-select-item-padding);
-    --svelte-select-item-height: var(--svelte-select-height);
-    --svelte-select-item-transition: var(--svelte-select-transition);
-    --svelte-select-item-first-radius: var(--svelte-select-radius-item-first);
-    --svelte-select-item-hover-bg: var(--svelte-select-accent-subtle);
-    --svelte-select-item-hover-color: var(--svelte-select-text);
-    --svelte-select-item-active-bg: var(--svelte-select-accent);
-    --svelte-select-item-active-color: var(--svelte-select-accent-text);
-    --svelte-select-item-pressed-bg: var(--svelte-select-accent-pressed);
-    --svelte-select-item-not-selectable-color: var(--svelte-select-not-selectable-color);
+    /* ---- single selected value ---- */
+    --svelte-select-selected-color: var(--selected-item-color, var(--svelte-select-text));
+    --svelte-select-selected-padding: var(--selected-item-padding, 0 20px 0 0);
+    --svelte-select-selected-overflow: var(--selected-item-overflow, hidden);
 
-    /* group title */
-    --svelte-select-group-color: var(--svelte-select-group-title-color);
+    /* ---- indicators ---- */
+    --svelte-select-indicators-position: var(--indicators-position, );
+    --svelte-select-indicators-top: var(--indicators-top, );
+    --svelte-select-indicators-right: var(--indicators-right, );
+    --svelte-select-indicators-bottom: var(--indicators-bottom, );
+    --svelte-select-clear-width: var(--clear-select-width, 40px);
+    --svelte-select-clear-height: var(--clear-select-height, 100%);
+    --svelte-select-clear-color: var(--clear-select-color, var(--svelte-select-icon-color));
+    --svelte-select-clear-margin: var(--clear-select-margin, 0);
+    --svelte-select-clear-focus-outline: var(--clear-select-focus-outline, 1px solid #006fe8);
+    --svelte-select-clear-icon-color: var(--clear-icon-color, currentColor);
+    --svelte-select-clear-icon-width: var(--clear-icon-width, 20px);
+    --svelte-select-loading-width: var(--loading-width, 40px);
+    --svelte-select-loading-height: var(--loading-height, );
+    --svelte-select-loading-color: var(--loading-color, var(--svelte-select-icon-color));
+    --svelte-select-loading-margin: var(--loading--margin, 0);
+    --svelte-select-spinner-width: var(--spinner-width, 20px);
+    --svelte-select-spinner-height: var(--spinner-height, 20px);
+    --svelte-select-spinner-color: var(--spinner-color, var(--svelte-select-icon-color));
+    --svelte-select-chevron-width: var(--chevron-width, 40px);
+    --svelte-select-chevron-height: var(--chevron-height, 40px);
+    --svelte-select-chevron-background: var(--chevron-background, transparent);
+    --svelte-select-chevron-pointer-events: var(--chevron-pointer-events, none);
+    --svelte-select-chevron-color: var(--chevron-color, var(--svelte-select-icon-color));
+    --svelte-select-chevron-border: var(--chevron-border, 0 0 0 1px solid #d8dbdf);
+    --svelte-select-chevron-icon-colour: var(--chevron-icon-colour, currentColor);
+    --svelte-select-chevron-icon-width: var(--chevron-icon-width, 20px);
 
-    /* multi-item chip */
-    --svelte-select-chip-color: var(--svelte-select-text);
-    --svelte-select-chip-background: var(--svelte-select-chip-bg);
-    --svelte-select-chip-border: var(--svelte-select-chip-outline);
-    --svelte-select-chip-active-border: var(--svelte-select-chip-active-outline);
-    --svelte-select-chip-clear-color: #000;
-    --svelte-select-chip-disabled-bg: var(--svelte-select-disabled-bg);
-    --svelte-select-chip-disabled-color: var(--svelte-select-disabled-text);
+    /* ---- list ---- */
+    --svelte-select-list-bg: var(--list-background, var(--svelte-select-bg));
+    --svelte-select-list-border: var(--list-border, );
+    --svelte-select-list-radius: var(--list-border-radius, var(--svelte-select-radius-list));
+    --svelte-select-list-shadow-token: var(--list-shadow, var(--svelte-select-list-shadow));
+    --svelte-select-list-max-height: var(--list-max-height, 252px);
+    --svelte-select-list-position: var(--list-position, absolute);
+    --svelte-select-list-z-index: var(--list-z-index, 2);
+    --svelte-select-list-empty-color: var(--list-empty-color, var(--svelte-select-muted));
+    --svelte-select-list-empty-padding: var(--list-empty-padding, 20px 0);
+    --svelte-select-list-empty-text-align: var(--list-empty-text-align, center);
 
-    /* indicators */
-    --svelte-select-clear-color: var(--svelte-select-icon-color);
-    --svelte-select-chevron-color: var(--svelte-select-icon-color);
-    --svelte-select-loading-color: var(--svelte-select-icon-color);
+    /* ---- item ---- */
+    --svelte-select-item-color: var(--item-color, var(--svelte-select-text));
+    --svelte-select-item-height: var(--item-height, var(--height, var(--svelte-select-height)));
+    --svelte-select-item-line-height: var(--item-line-height, var(--height, var(--svelte-select-height)));
+    --svelte-select-item-padding: var(--item-padding, 0 20px);
+    --svelte-select-item-transition: var(--item-transition, var(--svelte-select-transition));
+    --svelte-select-item-first-radius: var(--item-first-border-radius, 4px 4px 0 0);
+    --svelte-select-item-hover-bg: var(--item-hover-bg, var(--svelte-select-accent-subtle));
+    --svelte-select-item-hover-color: var(--item-hover-color, var(--svelte-select-text));
+    --svelte-select-item-active-bg: var(--item-is-active-bg, var(--svelte-select-accent));
+    --svelte-select-item-active-color: var(--item-is-active-color, var(--svelte-select-accent-text));
+    --svelte-select-item-pressed-bg: var(--item-active-background, var(--svelte-select-accent-pressed));
+    --svelte-select-item-not-selectable-color: var(--item-is-not-selectable-color, #999);
+    --svelte-select-group-item-padding-left: var(--group-item-padding-left, 40px);
 
-    /* states */
-    --svelte-select-disabled-background: var(--svelte-select-disabled-bg);
-    --svelte-select-disabled-border: var(--svelte-select-disabled-border-color);
-    --svelte-select-disabled-color: var(--svelte-select-disabled-text);
-    --svelte-select-error-border: 1px solid var(--svelte-select-danger);
-    --svelte-select-error-bg: var(--svelte-select-bg);
+    /* ---- group title ---- */
+    --svelte-select-group-title-color: var(--group-title-color, #8f8f8f);
+    --svelte-select-group-title-font-size: var(--group-title-font-size, 16px);
+    --svelte-select-group-title-font-weight: var(--group-title-font-weight, 600);
+    --svelte-select-group-title-padding: var(--group-title-padding, 0 20px);
+    --svelte-select-group-title-text-transform: var(--group-title-text-transform, uppercase);
+    --svelte-select-group-title-border-width: var(--group-title-border-width, medium);
+    --svelte-select-group-title-border-style: var(--group-title-border-style, none);
+    --svelte-select-group-title-border-color: var(--group-title-border-color, color);
+
+    /* ---- multi-item chip ---- */
+    --svelte-select-chip-bg: var(--multi-item-bg, #ebedef);
+    --svelte-select-chip-margin: var(--multi-item-margin, 0);
+    --svelte-select-chip-outline: var(--multi-item-outline, 1px solid #ddd);
+    --svelte-select-chip-radius: var(--multi-item-border-radius, 4px);
+    --svelte-select-chip-height: var(--multi-item-height, 25px);
+    --svelte-select-chip-padding: var(--multi-item-padding, 0 5px);
+    --svelte-select-chip-gap: var(--multi-item-gap, 4px);
+    --svelte-select-chip-max-width: var(--multi-max-width, none);
+    --svelte-select-chip-color: var(--multi-item-color, var(--svelte-select-item-color));
+    --svelte-select-chip-disabled-bg: var(--multi-item-disabled-hover-bg, #ebedef);
+    --svelte-select-chip-disabled-color: var(--multi-item-disabled-hover-color, var(--svelte-select-disabled-text));
+    --svelte-select-chip-clear-color: var(--multi-item-clear-icon-color, #000);
+    --svelte-select-chip-active-outline: var(--multi-item-active-outline, 1px solid #006fe8);
+    --svelte-select-multi-padding: var(--multi-select-padding, var(--svelte-select-internal-padding));
+    --svelte-select-multi-input-padding: var(--multi-select-input-padding, 0);
+    --svelte-select-multi-input-margin: var(--multi-select-input-margin, 5px 0);
+
+    /* ---- states ---- */
+    --svelte-select-disabled-background: var(--disabled-background, var(--svelte-select-disabled-bg));
+    --svelte-select-disabled-border-color: var(--disabled-border-color, var(--svelte-select-disabled-bg));
+    --svelte-select-disabled-color: var(--disabled-color, var(--svelte-select-disabled-text));
+    --svelte-select-disabled-placeholder-color: var(--disabled-placeholder-color, var(--svelte-select-disabled-text));
+    --svelte-select-disabled-placeholder-opacity: var(--disabled-placeholder-opacity, 1);
+    --svelte-select-error-border: var(--error-border, 1px solid var(--svelte-select-danger));
+    --svelte-select-error-bg: var(--error-background, var(--svelte-select-bg));
 }

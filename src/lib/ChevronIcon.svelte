@@ -15,8 +15,8 @@
 
 <style>
   svg {
-      width: var(--chevron-icon-width, 20px);
-      height: var(--chevron-icon-width, 20px);
-      color: var(--chevron-icon-colour, currentColor);
+      width: var(--svelte-select-chevron-icon-width);
+      height: var(--svelte-select-chevron-icon-width);
+      color: var(--svelte-select-chevron-icon-colour);
   }
 </style>

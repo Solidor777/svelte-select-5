@@ -12,9 +12,9 @@
 
 <style>
     .loading {
-        width: var(--spinner-width, 20px);
-        height: var(--spinner-height, 20px);
-        color: var(--spinner-color, var(--icons-color));
+        width: var(--svelte-select-spinner-width);
+        height: var(--svelte-select-spinner-height);
+        color: var(--svelte-select-spinner-color);
         animation: rotate 0.75s linear infinite;
         transform-origin: center center;
         transform: none;

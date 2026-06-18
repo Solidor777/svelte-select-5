@@ -27,62 +27,62 @@
 <style>
     .item {
         cursor: default;
-        height: var(--item-height, var(--height, 42px));
-        line-height: var(--item-line-height, var(--height, 42px));
-        padding: var(--item-padding, 0 20px);
-        color: var(--item-color, inherit);
+        height: var(--svelte-select-item-height);
+        line-height: var(--svelte-select-item-line-height);
+        padding: var(--svelte-select-item-padding);
+        color: var(--svelte-select-item-color);
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-        transition: var(--item-transition, all 0.2s);
+        transition: var(--svelte-select-item-transition);
         align-items: center;
         width: 100%;
     }
 
     .item.group-item {
-        padding-left: var(--group-item-padding-left, 40px);
+        padding-left: var(--svelte-select-group-item-padding-left);
     }
 
     .item:active {
-        background: var(--item-active-background, #b9daff);
+        background: var(--svelte-select-item-pressed-bg);
     }
 
     .item.active {
-        background: var(--item-is-active-bg, #007aff);
-        color: var(--item-is-active-color, #fff);
+        background: var(--svelte-select-item-active-bg);
+        color: var(--svelte-select-item-active-color);
     }
 
     .item.first {
-        border-radius: var(--item-first-border-radius, 4px 4px 0 0);
+        border-radius: var(--svelte-select-item-first-radius);
     }
 
     .item.hover:not(.active) {
-        background: var(--item-hover-bg, #e7f2ff);
-        color: var(--item-hover-color, inherit);
+        background: var(--svelte-select-item-hover-bg);
+        color: var(--svelte-select-item-hover-color);
     }
 
     .item.not-selectable,
     .item.hover.item.not-selectable,
     .item.active.item.not-selectable,
     .item.not-selectable:active {
-        color: var(--item-is-not-selectable-color, #999);
+        color: var(--svelte-select-item-not-selectable-color);
         background: transparent;
     }
 
     .list-group-title {
-        color: var(--group-title-color, #8f8f8f);
+        color: var(--svelte-select-group-title-color);
         cursor: default;
-        font-size: var(--group-title-font-size, 16px);
-        font-weight: var(--group-title-font-weight, 600);
-        height: var(--height, 42px);
-        line-height: var(--height, 42px);
-        padding: var(--group-title-padding, 0 20px);
+        font-size: var(--svelte-select-group-title-font-size);
+        font-weight: var(--svelte-select-group-title-font-weight);
+        height: var(--svelte-select-item-height);
+        line-height: var(--svelte-select-item-height);
+        padding: var(--svelte-select-group-title-padding);
         text-overflow: ellipsis;
         overflow-x: hidden;
         white-space: nowrap;
-        text-transform: var(--group-title-text-transform, uppercase);
-        border-width: var(--group-title-border-width, medium);
-        border-style: var(--group-title-border-style, none);
-        border-color: var(--group-title-border-color, color);
+        text-transform: var(--svelte-select-group-title-text-transform);
+        border-width: var(--svelte-select-group-title-border-width);
+        border-style: var(--svelte-select-group-title-border-style);
+        border-color: var(--svelte-select-group-title-border-color);
     }
 </style>

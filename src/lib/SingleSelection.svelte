@@ -9,12 +9,12 @@
 <style>
     .selected-item {
         position: relative;
-        overflow: var(--selected-item-overflow, hidden);
-        padding: var(--selected-item-padding, 0 20px 0 0);
+        overflow: var(--svelte-select-selected-overflow);
+        padding: var(--svelte-select-selected-padding);
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: var(--selected-item-color, inherit);
-        font-size: var(--font-size, 16px);
+        color: var(--svelte-select-selected-color);
+        font-size: var(--svelte-select-control-font-size);
     }
 
     .selected-item:focus {

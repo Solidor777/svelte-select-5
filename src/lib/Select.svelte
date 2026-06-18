@@ -832,26 +832,26 @@
 
         --internal-padding: 0 0 0 16px;
 
-        border: var(--border, 1px solid #d8dbdf);
-        border-radius: var(--border-radius, 6px);
-        min-height: var(--height, 42px);
+        border: var(--svelte-select-control-border);
+        border-radius: var(--svelte-select-control-radius);
+        min-height: var(--svelte-select-control-min-height);
         position: relative;
         display: flex;
         align-items: stretch;
-        padding: var(--padding, var(--internal-padding));
-        background: var(--background, #fff);
-        margin: var(--margin, 0);
-        width: var(--width, 100%);
-        font-size: var(--font-size, 16px);
-        max-height: var(--max-height);
+        padding: var(--svelte-select-control-padding);
+        background: var(--svelte-select-control-bg);
+        margin: var(--svelte-select-control-margin);
+        width: var(--svelte-select-control-width);
+        font-size: var(--svelte-select-control-font-size);
+        max-height: var(--svelte-select-control-max-height);
     }
 
     * {
-        box-sizing: var(--box-sizing, border-box);
+        box-sizing: var(--svelte-select-box-sizing);
     }
 
     .svelte-select:hover {
-        border: var(--border-hover, 1px solid #b2b8bf);
+        border: var(--svelte-select-control-border-hover);
     }
 
     .value-container {
@@ -860,9 +860,9 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 5px 10px;
-        padding: var(--value-container-padding, 5px 0);
+        padding: var(--svelte-select-value-container-padding);
         position: relative;
-        overflow: var(--value-container-overflow, hidden);
+        overflow: var(--svelte-select-value-container-overflow);
         align-self: stretch;
     }
 
@@ -874,27 +874,27 @@
     }
 
     .indicators {
-        position: var(--indicators-position);
-        top: var(--indicators-top);
-        right: var(--indicators-right);
-        bottom: var(--indicators-bottom);
+        position: var(--svelte-select-indicators-position);
+        top: var(--svelte-select-indicators-top);
+        right: var(--svelte-select-indicators-right);
+        bottom: var(--svelte-select-indicators-bottom);
     }
 
     input {
         position: absolute;
         cursor: default;
         border: none;
-        color: var(--input-color, var(--item-color));
-        padding: var(--input-padding, 0);
-        letter-spacing: var(--input-letter-spacing, inherit);
-        margin: var(--input-margin, 0);
+        color: var(--svelte-select-input-color);
+        padding: var(--svelte-select-input-padding);
+        letter-spacing: var(--svelte-select-input-letter-spacing);
+        margin: var(--svelte-select-input-margin);
         min-width: 10px;
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
         background: transparent;
-        font-size: var(--font-size, 16px);
+        font-size: var(--svelte-select-control-font-size);
     }
 
     :not(.multi) > .value-container > input {
@@ -903,8 +903,8 @@
     }
 
     input::placeholder {
-        color: var(--placeholder-color, #78848f);
-        opacity: var(--placeholder-opacity, 1);
+        color: var(--svelte-select-placeholder-color);
+        opacity: var(--svelte-select-placeholder-opacity);
     }
 
     input:focus {
@@ -912,19 +912,19 @@
     }
 
     .svelte-select.focused {
-        border: var(--border-focused, 1px solid #006fe8);
-        border-radius: var(--border-radius-focused, var(--border-radius, 6px));
+        border: var(--svelte-select-control-border-focused);
+        border-radius: var(--svelte-select-control-radius-focused);
     }
 
     .disabled {
-        background: var(--disabled-background, #ebedef);
-        border-color: var(--disabled-border-color, #ebedef);
-        color: var(--disabled-color, #c1c6cc);
+        background: var(--svelte-select-disabled-background);
+        border-color: var(--svelte-select-disabled-border-color);
+        color: var(--svelte-select-disabled-color);
     }
 
     .disabled input::placeholder {
-        color: var(--disabled-placeholder-color, #c1c6cc);
-        opacity: var(--disabled-placeholder-opacity, 1);
+        color: var(--svelte-select-disabled-placeholder-color);
+        opacity: var(--svelte-select-disabled-placeholder-opacity);
     }
 
     .icon {
@@ -938,50 +938,50 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: var(--clear-select-width, 40px);
-        height: var(--clear-select-height, 100%);
-        color: var(--clear-select-color, var(--icons-color));
-        margin: var(--clear-select-margin, 0);
+        width: var(--svelte-select-clear-width);
+        height: var(--svelte-select-clear-height);
+        color: var(--svelte-select-clear-color);
+        margin: var(--svelte-select-clear-margin);
         pointer-events: all;
         flex-shrink: 0;
     }
 
     .clear-select:focus {
-        outline: var(--clear-select-focus-outline, 1px solid #006fe8);
+        outline: var(--svelte-select-clear-focus-outline);
     }
 
     .loading {
-        width: var(--loading-width, 40px);
-        height: var(--loading-height);
-        color: var(--loading-color, var(--icons-color));
-        margin: var(--loading--margin, 0);
+        width: var(--svelte-select-loading-width);
+        height: var(--svelte-select-loading-height);
+        color: var(--svelte-select-loading-color);
+        margin: var(--svelte-select-loading-margin);
         flex-shrink: 0;
     }
 
     .chevron {
-        width: var(--chevron-width, 40px);
-        height: var(--chevron-height, 40px);
-        background: var(--chevron-background, transparent);
-        pointer-events: var(--chevron-pointer-events, none);
-        color: var(--chevron-color, var(--icons-color));
-        border: var(--chevron-border, 0 0 0 1px solid #d8dbdf);
+        width: var(--svelte-select-chevron-width);
+        height: var(--svelte-select-chevron-height);
+        background: var(--svelte-select-chevron-background);
+        pointer-events: var(--svelte-select-chevron-pointer-events);
+        color: var(--svelte-select-chevron-color);
+        border: var(--svelte-select-chevron-border);
         flex-shrink: 0;
     }
 
     .multi {
-        padding: var(--multi-select-padding, var(--internal-padding));
+        padding: var(--svelte-select-multi-padding);
     }
 
     .multi input {
-        padding: var(--multi-select-input-padding, 0);
+        padding: var(--svelte-select-multi-input-padding);
         position: relative;
-        margin: var(--multi-select-input-margin, 5px 0);
+        margin: var(--svelte-select-multi-input-margin);
         flex: 1 1 40px;
     }
 
     .svelte-select.error {
-        border: var(--error-border, 1px solid #ff2d55);
-        background: var(--error-background, #fff);
+        border: var(--svelte-select-error-border);
+        background: var(--svelte-select-error-bg);
     }
 
     .a11y-text {
