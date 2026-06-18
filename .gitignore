@@ -8,3 +8,8 @@ node_modules
 /package
 /src/lib/no-styles
 .env
+/.claude
+CLAUDE.md
+/test-results
+/playwright-report
+/.playwright
