@@ -10,5 +10,7 @@
 
 
 <Select {items} listOpen>
-    <div slot="list-append">* AFTER *</div>
+    {#snippet listAppend()}
+        <div>* AFTER *</div>
+    {/snippet}
 </Select>

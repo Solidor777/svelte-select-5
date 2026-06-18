@@ -9,7 +9,9 @@
 </script>
 
 <Select {items} loading>
-    <div slot="loading-icon">★</div>
+    {#snippet loadingIcon()}
+        <div>★</div>
+    {/snippet}
 </Select>
 
 <style>

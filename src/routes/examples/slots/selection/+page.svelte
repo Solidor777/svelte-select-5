@@ -10,16 +10,20 @@
 
 
 <Select {items}>
-    <div slot="selection" let:selection>
-        🎉 {selection.label} 🎉 
-    </div>
+    {#snippet selection(selection, index)}
+        <div>
+            🎉 {selection.label} 🎉
+        </div>
+    {/snippet}
 </Select>
 
 <br />
 <br />
 
 <Select {items} multiple>
-    <div slot="selection" let:selection let:index>
-        🎉 {index} : {selection.label} 🎉 
-    </div>
+    {#snippet selection(selection, index)}
+        <div>
+            🎉 {index} : {selection.label} 🎉
+        </div>
+    {/snippet}
 </Select>

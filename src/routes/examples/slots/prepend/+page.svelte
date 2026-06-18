@@ -10,7 +10,9 @@
 
 
 <Select {items}>
-    <div slot="prepend">💪</div>
+    {#snippet prepend()}
+        <div>💪</div>
+    {/snippet}
 </Select>
 
 <style>

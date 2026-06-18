@@ -7,12 +7,12 @@
         { value: 'three', label: 'Three' },
     ];
 
-    function handle(e) {
-        console.log(e.detail);
+    function handle(removed) {
+        console.log(removed);
     }
 </script>
 
-<Select {items} on:clear={handle} />
+<Select {items} onclear={handle} />
 <br />
-<Select {items} on:clear={handle} multiple />
+<Select {items} onclear={handle} multiple />
 

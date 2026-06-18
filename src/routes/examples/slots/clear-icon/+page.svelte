@@ -9,7 +9,9 @@
 </script>
 
 <Select {items}>
-    <div slot="clear-icon">❌</div>
+    {#snippet clearIcon()}
+        <div>❌</div>
+    {/snippet}
 </Select>
 
 <style>
