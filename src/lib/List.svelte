@@ -10,7 +10,6 @@
         hoverItemIndex = $bindable(0),
         hideEmptyState = false,
         listAutoWidth = true,
-        prefloat = false,
         floatingContent = () => ({}),
         getContainerWidth,
         onhover,
@@ -23,6 +22,17 @@
         empty,
         list: listOverride,
     } = $props();
+
+    // Mounted only while the list is open. Hide for the first frame so floating-ui
+    // can position before paint, then reveal (mirrors the original listMounted).
+    let prefloat = $state(true);
+    $effect(() => {
+        prefloat = true;
+        const t = setTimeout(() => {
+            prefloat = false;
+        }, 0);
+        return () => clearTimeout(t);
+    });
 
     // Vestigial in the original: never set true, so the hover guard never fires.
     // Preserved for behavioral parity.
@@ -58,7 +68,7 @@
             update(args) {
                 if (args.active || args.hover) {
                     handleListScroll();
-                    node.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+                    node.scrollIntoView?.({ behavior: 'auto', block: 'nearest' });
                 }
             },
         };

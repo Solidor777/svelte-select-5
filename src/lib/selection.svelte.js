@@ -8,7 +8,11 @@ export function coerceValue(value, { items, itemId, multiple }) {
     }
 
     if (multiple && Array.isArray(value) && value.length > 0) {
-        return value.map((item) => (typeof item === 'string' ? { value: item, label: item } : item));
+        // Idempotent: only allocate a new array when a string entry needs wrapping,
+        // so an effect re-running coerceValue(value) converges instead of looping.
+        if (value.some((item) => typeof item === 'string')) {
+            return value.map((item) => (typeof item === 'string' ? { value: item, label: item } : item));
+        }
     }
 
     return value;

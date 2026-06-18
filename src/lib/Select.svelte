@@ -1,133 +1,118 @@
 <script>
-    import { beforeUpdate, createEventDispatcher, onDestroy, onMount } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import { offset, flip, shift } from 'svelte-floating-ui/dom';
     import { createFloatingActions } from 'svelte-floating-ui';
 
-    const dispatch = createEventDispatcher();
-
-    import _filter from './filter';
-    import _getItems from './get-items';
+    import { filterItems, convertStringItemsToObjects, loadAndConvert } from './filtering.svelte.js';
+    import { coerceValue, computeJustValue } from './selection.svelte.js';
 
     import ChevronIcon from './ChevronIcon.svelte';
     import ClearIcon from './ClearIcon.svelte';
     import LoadingIcon from './LoadingIcon.svelte';
-
-    export let justValue = null; // read-only
-
-    export let filter = _filter;
-    export let getItems = _getItems;
-
-    export let id = null;
-    export let name = null;
-    export let container = undefined;
-    export let input = undefined;
-    export let multiple = false;
-    export let multiFullItemClearable = false;
-    export let disabled = false;
-    export let focused = false;
-    export let value = null;
-    export let filterText = '';
-    export let placeholder = 'Please select';
-    export let placeholderAlwaysShow = false;
-    export let items = null;
-    export let label = 'label';
-    export let itemFilter = (label, filterText, option) => `${label}`.toLowerCase().includes(filterText.toLowerCase());
-    export let groupBy = undefined;
-    export let groupFilter = (groups) => groups;
-    export let groupHeaderSelectable = false;
-    export let itemId = 'value';
-    export let loadOptions = undefined;
-    export let containerStyles = '';
-    export let hasError = false;
-    export let filterSelectedItems = true;
-    export let required = false;
-    export let closeListOnChange = true;
-    export let clearFilterTextOnBlur = true;
-
-    export let createGroupHeaderItem = (groupValue, item) => {
-        return {
-            value: groupValue,
-            [label]: groupValue,
-        };
-    };
-
-    export const getFilteredItems = () => {
-        return filteredItems;
-    };
-
-    export let searchable = true;
-    export let inputStyles = '';
-    export let clearable = true;
-    export let loading = false;
-    export let listOpen = false;
+    import List from './List.svelte';
+    import SingleSelection from './SingleSelection.svelte';
+    import MultiSelection from './MultiSelection.svelte';
 
     let timeout;
-    export let debounce = (fn, wait = 1) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(fn, wait);
-    };
 
-    export let debounceWait = 300;
-    export let hideEmptyState = false;
-    export let inputAttributes = {};
-    export let listAutoWidth = true;
-    export let showChevron = false;
-    export let listOffset = 5;
-    export let hoverItemIndex = 0;
-    export let floatingConfig = {};
+    let {
+        // Two-way-bindable state
+        justValue = $bindable(null),
+        value = $bindable(null),
+        filterText = $bindable(''),
+        focused = $bindable(false),
+        listOpen = $bindable(false),
+        hoverItemIndex = $bindable(0),
+        items = $bindable(null),
+        loading = $bindable(false),
+        container = $bindable(undefined),
+        input = $bindable(undefined),
 
-    export { containerClasses as class };
+        // Behavior props
+        filter = filterItems,
+        getItems = loadAndConvert,
+        id = null,
+        name = null,
+        multiple = false,
+        multiFullItemClearable = false,
+        disabled = false,
+        placeholder = 'Please select',
+        placeholderAlwaysShow = false,
+        label = 'label',
+        itemFilter = (label, filterText, option) => `${label}`.toLowerCase().includes(filterText.toLowerCase()),
+        groupBy = undefined,
+        groupFilter = (groups) => groups,
+        groupHeaderSelectable = false,
+        itemId = 'value',
+        loadOptions = undefined,
+        containerStyles = '',
+        hasError = false,
+        filterSelectedItems = true,
+        required = false,
+        closeListOnChange = true,
+        clearFilterTextOnBlur = true,
+        createGroupHeaderItem = (groupValue, item) => ({ value: groupValue, [label]: groupValue }),
+        searchable = true,
+        inputStyles = '',
+        clearable = true,
+        debounce = (fn, wait = 1) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(fn, wait);
+        },
+        debounceWait = 300,
+        hideEmptyState = false,
+        inputAttributes = {},
+        listAutoWidth = true,
+        showChevron = false,
+        listOffset = 5,
+        floatingConfig = {},
+        ariaValues = (values) => `Option ${values}, selected.`,
+        ariaListOpen = (label, count) => `You are currently focused on option ${label}. There are ${count} results available.`,
+        ariaFocused = () => `Select is focused, type to refine list, press down to open the menu.`,
+        class: containerClasses = '',
 
-    let containerClasses = '';
-    let activeValue;
+        // Callback props (replace createEventDispatcher events)
+        onchange,
+        onselect,
+        oninput,
+        onclear,
+        onfocus,
+        onblur,
+        onhoveritem,
+        onfilter,
+        onerror,
+        onloaded,
+
+        // Snippets (replace named slots)
+        prepend,
+        selection,
+        clearIcon,
+        multiClearIcon,
+        loadingIcon,
+        chevronIcon,
+        list,
+        listPrepend,
+        listAppend,
+        item,
+        empty,
+        inputHidden,
+        requiredSnippet,
+    } = $props();
+
+    let activeValue = $state();
+    let listEl = $state();
+
+    // Previous-cycle snapshots (mirror the original beforeUpdate lag).
     let prev_value;
     let prev_filterText;
     let prev_multiple;
 
+    export function getFilteredItems() {
+        return filteredItems;
+    }
+
     function setValue() {
-        if (typeof value === 'string') {
-            let item = (items || []).find((item) => item[itemId] === value);
-            value = item || {
-                [itemId]: value,
-                label: value,
-            };
-        } else if (multiple && Array.isArray(value) && value.length > 0) {
-            value = value.map((item) => (typeof item === 'string' ? { value: item, label: item } : item));
-        }
-    }
-
-    let _inputAttributes;
-    function assignInputAttributes() {
-        _inputAttributes = Object.assign(
-            {
-                autocapitalize: 'none',
-                autocomplete: 'off',
-                autocorrect: 'off',
-                spellcheck: false,
-                tabindex: 0,
-                type: 'text',
-                'aria-autocomplete': 'list',
-            },
-            inputAttributes
-        );
-
-        if (id) {
-            _inputAttributes['id'] = id;
-        }
-
-        if (!searchable) {
-            _inputAttributes['readonly'] = true;
-        }
-    }
-
-    function convertStringItemsToObjects(_items) {
-        return _items.map((item, index) => {
-            return {
-                index,
-                value: item,
-                label: `${item}`,
-            };
-        });
+        value = coerceValue(value, { items, itemId, multiple });
     }
 
     function filterGroupedItems(_items) {
@@ -156,7 +141,6 @@
         });
 
         const sortedGroupedItems = [];
-
         groupFilter(groupValues).forEach((groupValue) => {
             if (groups[groupValue]) sortedGroupedItems.push(...groups[groupValue]);
         });
@@ -168,24 +152,20 @@
         if (multiple) {
             if (JSON.stringify(value) !== JSON.stringify(prev_value)) {
                 if (checkValueForDuplicates()) {
-                    dispatch('input', value);
+                    oninput?.(value);
                 }
             }
             return;
         }
 
         if (!prev_value || JSON.stringify(value[itemId]) !== JSON.stringify(prev_value[itemId])) {
-            dispatch('input', value);
+            oninput?.(value);
         }
     }
 
     function setupMulti() {
         if (value) {
-            if (Array.isArray(value)) {
-                value = [...value];
-            } else {
-                value = [value];
-            }
+            value = Array.isArray(value) ? [...value] : [value];
         }
     }
 
@@ -193,28 +173,9 @@
         if (value) value = null;
     }
 
-    $: if ((items, value)) setValue();
-    $: if (inputAttributes || !searchable) assignInputAttributes();
-    $: if (multiple) setupMulti();
-    $: if (prev_multiple && !multiple) setupSingle();
-    $: if (multiple && value && value.length > 1) checkValueForDuplicates();
-    $: if (value) dispatchSelectedItem();
-    $: if (!value && multiple && prev_value) dispatch('input', value);
-    $: if (!focused && input) closeList();
-    $: if (filterText !== prev_filterText) setupFilterText();
-    $: if (!multiple && listOpen && value && filteredItems) setValueIndexAsHoverIndex();
-    $: dispatchHover(hoverItemIndex);
-
     function setValueIndexAsHoverIndex() {
-        const valueIndex = filteredItems.findIndex((i) => {
-            return i[itemId] === value[itemId];
-        });
-
+        const valueIndex = filteredItems.findIndex((i) => i[itemId] === value[itemId]);
         checkHoverSelectable(valueIndex, true);
-    }
-
-    function dispatchHover(i) {
-        dispatch('hoverItem', i);
     }
 
     function checkHoverSelectable(startingIndex = 0, ignoreGroup) {
@@ -231,10 +192,11 @@
             debounce(async function () {
                 loading = true;
                 let res = await getItems({
-                    dispatch,
                     loadOptions,
                     convertStringItemsToObjects,
                     filterText,
+                    onError: onerror,
+                    onLoaded: onloaded,
                 });
 
                 if (res) {
@@ -250,67 +212,8 @@
             }, debounceWait);
         } else {
             listOpen = true;
-
-            if (multiple) {
-                activeValue = undefined;
-            }
+            if (multiple) activeValue = undefined;
         }
-    }
-
-    $: hasValue = multiple ? value && value.length > 0 : value;
-    $: hideSelectedItem = hasValue && filterText.length > 0;
-    $: showClear = hasValue && clearable && !disabled && !loading;
-    $: placeholderText =
-        placeholderAlwaysShow && multiple
-            ? placeholder
-            : multiple && value?.length === 0
-            ? placeholder
-            : value
-            ? ''
-            : placeholder;
-    $: ariaSelection = value ? handleAriaSelection(multiple) : '';
-    $: ariaContext = handleAriaContent({ filteredItems, hoverItemIndex, focused, listOpen });
-    $: updateValueDisplay(items);
-    $: justValue = computeJustValue(multiple, value, itemId);
-    $: if (!multiple && prev_value && !value) dispatch('input', value);
-    $: filteredItems = filter({
-        loadOptions,
-        filterText,
-        items,
-        multiple,
-        value,
-        itemId,
-        groupBy,
-        label,
-        filterSelectedItems,
-        itemFilter,
-        convertStringItemsToObjects,
-        filterGroupedItems,
-    });
-    $: if (listOpen && filteredItems && !multiple && !value) checkHoverSelectable();
-    $: handleFilterEvent(filteredItems);
-    $: if (container && floatingConfig) floatingUpdate(Object.assign(_floatingConfig, floatingConfig));
-    $: listDom = !!list;
-    $: listMounted(list, listOpen);
-    $: if (listOpen && container && list) setListWidth();
-    $: scrollToHoverItem = hoverItemIndex;
-    $: if (listOpen && multiple) hoverItemIndex = 0;
-    $: if (input && listOpen && !focused) handleFocus();
-    $: if (filterText) hoverItemIndex = 0;
-
-    function handleFilterEvent(items) {
-        if (listOpen) dispatch('filter', items);
-    }
-
-    beforeUpdate(async () => {
-        prev_value = value;
-        prev_filterText = filterText;
-        prev_multiple = multiple;
-    });
-
-    function computeJustValue() {
-        if (multiple) return value ? value.map((item) => item[itemId]) : null;
-        return value ? value[itemId] : value;
     }
 
     function checkValueForDuplicates() {
@@ -349,18 +252,16 @@
         }
     }
 
-    async function handleMultiItemClear(i) {
+    function handleMultiItemClear(i) {
         const itemToRemove = value[i];
 
         if (value.length === 1) {
             value = undefined;
         } else {
-            value = value.filter((item) => {
-                return item !== itemToRemove;
-            });
+            value = value.filter((item) => item !== itemToRemove);
         }
 
-        dispatch('clear', itemToRemove);
+        onclear?.(itemToRemove);
     }
 
     function handleKeyDown(e) {
@@ -373,7 +274,6 @@
                 break;
             case 'Enter':
                 e.preventDefault();
-
                 if (listOpen) {
                     if (filteredItems.length === 0) break;
                     const hoverItem = filteredItems[hoverItemIndex];
@@ -385,53 +285,42 @@
                         handleSelect(filteredItems[hoverItemIndex]);
                     }
                 }
-
                 break;
             case 'ArrowDown':
                 e.preventDefault();
-
                 if (listOpen) {
                     setHoverIndex(1);
                 } else {
                     listOpen = true;
                     activeValue = undefined;
                 }
-
                 break;
             case 'ArrowUp':
                 e.preventDefault();
-
                 if (listOpen) {
                     setHoverIndex(-1);
                 } else {
                     listOpen = true;
                     activeValue = undefined;
                 }
-
                 break;
             case 'Tab':
                 if (listOpen && focused) {
-                    if (
-                        filteredItems.length === 0 ||
-                        (value && value[itemId] === filteredItems[hoverItemIndex][itemId])
-                    )
+                    if (filteredItems.length === 0 || (value && value[itemId] === filteredItems[hoverItemIndex][itemId]))
                         return closeList();
 
                     e.preventDefault();
                     handleSelect(filteredItems[hoverItemIndex]);
                     closeList();
                 }
-
                 break;
             case 'Backspace':
                 if (!multiple || filterText.length > 0) return;
-
                 if (multiple && value && value.length > 0) {
                     handleMultiItemClear(activeValue !== undefined ? activeValue : value.length - 1);
                     if (activeValue === 0 || activeValue === undefined) break;
                     activeValue = value.length > activeValue ? activeValue - 1 : undefined;
                 }
-
                 break;
             case 'ArrowLeft':
                 if (!value || !multiple || filterText.length > 0) return;
@@ -454,15 +343,14 @@
 
     function handleFocus(e) {
         if (focused && input === document?.activeElement) return;
-        if (e) dispatch('focus', e);
+        if (e) onfocus?.(e);
         input?.focus();
         focused = true;
     }
 
-    async function handleBlur(e) {
-        if (isScrolling) return;
+    function handleBlur(e) {
         if (listOpen || focused) {
-            dispatch('blur', e);
+            onblur?.(e);
             closeList();
             focused = false;
             activeValue = undefined;
@@ -472,21 +360,16 @@
 
     function handleClick() {
         if (disabled) return;
-        if (filterText.length > 0) return listOpen = true;
+        if (filterText.length > 0) return (listOpen = true);
         listOpen = !listOpen;
     }
 
     export function handleClear() {
-        dispatch('clear', value);
+        onclear?.(value);
         value = undefined;
         closeList();
         handleFocus();
     }
-
-    onMount(() => {
-        if (listOpen) focused = true;
-        if (focused && input) input.focus();
-    });
 
     function itemSelected(selection) {
         if (selection) {
@@ -499,40 +382,24 @@
             setTimeout(() => {
                 if (closeListOnChange) closeList();
                 activeValue = undefined;
-                dispatch('change', value);
-                dispatch('select', selection);
+                onchange?.(value);
+                onselect?.(selection);
             });
         }
     }
 
     function closeList() {
-        if (clearFilterTextOnBlur) {
-            filterText = '';
-        }
+        if (clearFilterTextOnBlur) filterText = '';
         listOpen = false;
     }
 
-    export let ariaValues = (values) => {
-        return `Option ${values}, selected.`;
-    };
-
-    export let ariaListOpen = (label, count) => {
-        return `You are currently focused on option ${label}. There are ${count} results available.`;
-    };
-
-    export let ariaFocused = () => {
-        return `Select is focused, type to refine list, press down to open the menu.`;
-    };
-
     function handleAriaSelection(_multiple) {
         let selected = undefined;
-
         if (_multiple && value.length > 0) {
             selected = value.map((v) => v[label]).join(', ');
         } else {
             selected = value[label];
         }
-
         return ariaValues(selected);
     }
 
@@ -547,27 +414,11 @@
         }
     }
 
-    let list = null;
-
-    let isScrollingTimer;
-    function handleListScroll() {
-        clearTimeout(isScrollingTimer);
-        isScrollingTimer = setTimeout(() => {
-            isScrolling = false;
-        }, 100);
-    }
-
     function handleClickOutside(event) {
-        if (!listOpen && !focused && container && !container.contains(event.target) && !list?.contains(event.target)) {
+        if (!listOpen && !focused && container && !container.contains(event.target) && !listEl?.contains(event.target)) {
             handleBlur();
         }
     }
-
-    onDestroy(() => {
-        list?.remove();
-    });
-
-    let isScrolling = false;
 
     function handleSelect(item) {
         if (!item || item.selectable === false) return;
@@ -575,7 +426,6 @@
     }
 
     function handleHover(i) {
-        if (isScrolling) return;
         hoverItemIndex = i;
     }
 
@@ -584,7 +434,7 @@
         if (item?.selectable === false) return;
         if (value && !multiple && value[itemId] === item[itemId]) return closeList();
         if (isItemSelectable(item)) {
-            hoverItemIndex = i;
+            if (i !== undefined) hoverItemIndex = i;
             handleSelect(item);
         }
     }
@@ -607,68 +457,196 @@
         }
 
         const hover = filteredItems[hoverItemIndex];
-
         if (hover && hover.selectable === false) {
             if (increment === 1 || increment === -1) setHoverIndex(increment);
-            return;
         }
     }
 
-    function isItemActive(item, value, itemId) {
-        if (multiple) return;
-        return value && value[itemId] === item[itemId];
-    }
-
-    function isItemFirst(itemIndex) {
-        return itemIndex === 0;
-    }
-
     function isItemSelectable(item) {
-        return (item.groupHeader && item.selectable) || item.selectable || !item.hasOwnProperty('selectable');
+        return (item.groupHeader && item.selectable) || item.selectable || !Object.hasOwn(item, 'selectable');
     }
 
-    const activeScroll = scrollAction;
-    const hoverScroll = scrollAction;
-
-    function scrollAction(node) {
-        return {
-            update(args) {
-                if (args.scroll) {
-                    handleListScroll();
-                    node.scrollIntoView({ behavior: 'auto', block: 'nearest' });
-                }
-            },
-        };
+    function handleFilterEvent(items) {
+        if (listOpen) onfilter?.(items);
     }
 
-    function setListWidth() {
-        const { width } = container.getBoundingClientRect();
-        list.style.width = listAutoWidth ? width + 'px' : 'auto';
-    }
-
+    // Floating UI: ref on the control, content action passed down to List.
     let _floatingConfig = {
         strategy: 'absolute',
         placement: 'bottom-start',
         middleware: [offset(listOffset), flip(), shift()],
         autoUpdate: false,
     };
-
     const [floatingRef, floatingContent, floatingUpdate] = createFloatingActions(_floatingConfig);
 
-    $: if (container && floatingConfig?.autoUpdate === undefined) {
-        _floatingConfig.autoUpdate = true;
-    }
+    // Derived state (pure).
+    let _inputAttributes = $derived.by(() => {
+        const attrs = Object.assign(
+            {
+                autocapitalize: 'none',
+                autocomplete: 'off',
+                autocorrect: 'off',
+                spellcheck: false,
+                tabindex: 0,
+                type: 'text',
+                'aria-autocomplete': 'list',
+            },
+            inputAttributes
+        );
+        if (id) attrs.id = id;
+        if (!searchable) attrs.readonly = true;
+        return attrs;
+    });
 
-    let prefloat = true;
-    function listMounted(list, listOpen) {
-        if (!list || !listOpen) return (prefloat = true);
-        setTimeout(() => {
-            prefloat = false;
-        }, 0);
-    }
+    let filteredItems = $derived(
+        filter({
+            loadOptions,
+            filterText,
+            items,
+            multiple,
+            value,
+            itemId,
+            groupBy,
+            label,
+            filterSelectedItems,
+            itemFilter,
+            convertStringItemsToObjects,
+            filterGroupedItems,
+        })
+    );
+
+    let hasValue = $derived(multiple ? value && value.length > 0 : value);
+    let hideSelectedItem = $derived(hasValue && filterText.length > 0);
+    let showClear = $derived(hasValue && clearable && !disabled && !loading);
+    let placeholderText = $derived(
+        placeholderAlwaysShow && multiple
+            ? placeholder
+            : multiple && value?.length === 0
+            ? placeholder
+            : value
+            ? ''
+            : placeholder
+    );
+    let ariaSelection = $derived(value ? handleAriaSelection(multiple) : '');
+    let ariaContext = $derived(handleAriaContent(filteredItems, hoverItemIndex, focused, listOpen));
+
+    // Effects. Each mirrors a Svelte 3 `$:` statement: the tracked reads match
+    // the variables the original statement referenced directly; mutation helpers
+    // run inside untrack() so they don't widen the dependency set into a loop
+    // (Svelte 3 never tracked variables read only inside called functions).
+    $effect(() => {
+        items;
+        value;
+        untrack(() => setValue());
+    });
+
+    $effect(() => {
+        if (multiple) untrack(() => setupMulti());
+    });
+
+    $effect(() => {
+        multiple;
+        untrack(() => {
+            if (prev_multiple && !multiple) setupSingle();
+        });
+    });
+
+    $effect(() => {
+        if (multiple && value && value.length > 1) untrack(() => checkValueForDuplicates());
+    });
+
+    $effect(() => {
+        if (value) untrack(() => dispatchSelectedItem());
+    });
+
+    $effect(() => {
+        if (!value && multiple && prev_value) untrack(() => oninput?.(value));
+    });
+
+    $effect(() => {
+        if (!multiple && prev_value && !value) untrack(() => oninput?.(value));
+    });
+
+    $effect(() => {
+        if (!focused && input) untrack(() => closeList());
+    });
+
+    $effect(() => {
+        filterText;
+        untrack(() => {
+            if (filterText !== prev_filterText) setupFilterText();
+        });
+    });
+
+    $effect(() => {
+        if (!multiple && listOpen && value && filteredItems) untrack(() => setValueIndexAsHoverIndex());
+    });
+
+    $effect(() => {
+        hoverItemIndex;
+        untrack(() => onhoveritem?.(hoverItemIndex));
+    });
+
+    $effect(() => {
+        items;
+        untrack(() => updateValueDisplay(items));
+    });
+
+    $effect(() => {
+        justValue = computeJustValue(value, itemId, multiple);
+    });
+
+    $effect(() => {
+        if (listOpen && filteredItems && !multiple && !value) untrack(() => checkHoverSelectable());
+    });
+
+    $effect(() => {
+        filteredItems;
+        untrack(() => handleFilterEvent(filteredItems));
+    });
+
+    $effect(() => {
+        if (container && floatingConfig) untrack(() => floatingUpdate(Object.assign(_floatingConfig, floatingConfig)));
+    });
+
+    $effect(() => {
+        if (container && floatingConfig?.autoUpdate === undefined) untrack(() => (_floatingConfig.autoUpdate = true));
+    });
+
+    $effect(() => {
+        if (listOpen && multiple) untrack(() => (hoverItemIndex = 0));
+    });
+
+    $effect(() => {
+        if (input && listOpen && !focused) untrack(() => handleFocus());
+    });
+
+    $effect(() => {
+        filterText;
+        untrack(() => {
+            if (filterText) hoverItemIndex = 0;
+        });
+    });
+
+    // Trailing effect: snapshot current values as "previous" for the next cycle
+    // (replaces beforeUpdate). Placed last so reader effects above see the lagged
+    // values before this overwrites them.
+    $effect(() => {
+        value;
+        filterText;
+        multiple;
+        prev_value = value;
+        prev_filterText = filterText;
+        prev_multiple = multiple;
+    });
+
+    onMount(() => {
+        if (listOpen) focused = true;
+        if (focused && input) input.focus();
+    });
 </script>
 
-<svelte:window on:click={handleClickOutside} on:keydown={handleKeyDown} />
+<svelte:window onclick={handleClickOutside} onkeydown={handleKeyDown} />
 
 <div
     class="svelte-select {containerClasses}"
@@ -679,112 +657,68 @@
     class:show-chevron={showChevron}
     class:error={hasError}
     style={containerStyles}
-    on:pointerup|preventDefault={handleClick}
+    onpointerup={(e) => {
+        e.preventDefault();
+        handleClick();
+    }}
     bind:this={container}
     use:floatingRef
     role="none">
     {#if listOpen}
-        <div
-            use:floatingContent
-            bind:this={list}
-            class="svelte-select-list"
-            class:prefloat
-            on:scroll={handleListScroll}
-            on:pointerup|preventDefault|stopPropagation
-            on:mousedown|preventDefault|stopPropagation
-			role="none">
-            {#if $$slots['list-prepend']}<slot name="list-prepend" />{/if}
-            {#if $$slots.list}<slot name="list" {filteredItems} />
-            {:else if filteredItems.length > 0}
-                {#each filteredItems as item, i}
-                    <div
-                        on:mouseover={() => handleHover(i)}
-                        on:focus={() => handleHover(i)}
-                        on:click|stopPropagation={() => handleItemClick({ item, i })}
-                        on:keydown|preventDefault|stopPropagation
-                        class="list-item"
-                        tabindex="-1"
-                        role="none">
-                        <div
-                            use:activeScroll={{ scroll: isItemActive(item, value, itemId), listDom }}
-                            use:hoverScroll={{ scroll: scrollToHoverItem === i, listDom }}
-                            class="item"
-                            class:list-group-title={item.groupHeader}
-                            class:active={isItemActive(item, value, itemId)}
-                            class:first={isItemFirst(i)}
-                            class:hover={hoverItemIndex === i}
-                            class:group-item={item.groupItem}
-                            class:not-selectable={item?.selectable === false}>
-                            <slot name="item" {item} index={i}>
-                                {item?.[label]}
-                            </slot>
-                        </div>
-                    </div>
-                {/each}
-            {:else if !hideEmptyState}
-                <slot name="empty">
-                    <div class="empty">No options</div>
-                </slot>
-            {/if}
-            {#if $$slots['list-append']}<slot name="list-append" />{/if}
-        </div>
+        <List
+            bind:listEl
+            bind:hoverItemIndex
+            {filteredItems}
+            {label}
+            {itemId}
+            {value}
+            {multiple}
+            {hideEmptyState}
+            {listAutoWidth}
+            floatingContent={floatingContent}
+            getContainerWidth={() => container?.getBoundingClientRect().width}
+            onhover={handleHover}
+            onselect={(it, i) => handleItemClick({ item: it, i })}
+            {item}
+            {empty}
+            {listPrepend}
+            {listAppend}
+            {list} />
     {/if}
 
     <span aria-live="polite" aria-atomic="false" aria-relevant="additions text" class="a11y-text">
         {#if focused}
             <span id="aria-selection">{ariaSelection}</span>
-            <span id="aria-context">
-                {ariaContext}
-            </span>
+            <span id="aria-context">{ariaContext}</span>
         {/if}
     </span>
 
     <div class="prepend">
-        <slot name="prepend" />
+        {#if prepend}{@render prepend()}{/if}
     </div>
 
     <div class="value-container">
         {#if hasValue}
             {#if multiple}
-                {#each value as item, i}
-                    <div
-                        class="multi-item"
-                        class:active={activeValue === i}
-                        class:disabled
-                        on:click|preventDefault={() => (multiFullItemClearable ? handleMultiItemClear(i) : {})}
-                        on:keydown|preventDefault|stopPropagation
-                        role="none">
-                        <span class="multi-item-text">
-                            <slot name="selection" selection={item} index={i}>
-                                {item[label]}
-                            </slot>
-                        </span>
-
-                        {#if !disabled && !multiFullItemClearable && ClearIcon}
-                            <div
-                                class="multi-item-clear"
-                                on:pointerup|preventDefault|stopPropagation={() => handleMultiItemClear(i)}>
-                                <slot name="multi-clear-icon">
-                                    <ClearIcon />
-                                </slot>
-                            </div>
-                        {/if}
-                    </div>
-                {/each}
+                <MultiSelection
+                    {value}
+                    {label}
+                    {disabled}
+                    {multiFullItemClearable}
+                    {activeValue}
+                    onclear={handleMultiItemClear}
+                    {selection}
+                    {multiClearIcon} />
             {:else}
-                <div class="selected-item" class:hide-selected-item={hideSelectedItem}>
-                    <slot name="selection" selection={value}>
-                        {value[label]}
-                    </slot>
-                </div>
+                <SingleSelection {value} {label} {hideSelectedItem} {selection} />
             {/if}
         {/if}
 
         <input
-            on:keydown={handleKeyDown}
-            on:blur={handleBlur}
-            on:focus={handleFocus}
-            readOnly={!searchable}
+            onkeydown={handleKeyDown}
+            onblur={handleBlur}
+            onfocus={handleFocus}
+            readonly={!searchable}
             {..._inputAttributes}
             bind:this={input}
             bind:value={filterText}
@@ -796,37 +730,31 @@
     <div class="indicators">
         {#if loading}
             <div class="icon loading" aria-hidden="true">
-                <slot name="loading-icon">
-                    <LoadingIcon />
-                </slot>
+                {#if loadingIcon}{@render loadingIcon()}{:else}<LoadingIcon />{/if}
             </div>
         {/if}
 
         {#if showClear}
-            <button type="button" class="icon clear-select" on:click={handleClear}>
-                <slot name="clear-icon">
-                    <ClearIcon />
-                </slot>
+            <button type="button" class="icon clear-select" onclick={handleClear}>
+                {#if clearIcon}{@render clearIcon()}{:else}<ClearIcon />{/if}
             </button>
         {/if}
 
         {#if showChevron}
             <div class="icon chevron" aria-hidden="true">
-                <slot name="chevron-icon" {listOpen}>
-                    <ChevronIcon />
-                </slot>
+                {#if chevronIcon}{@render chevronIcon(listOpen)}{:else}<ChevronIcon />{/if}
             </div>
         {/if}
     </div>
 
-    <slot name="input-hidden" {value}>
+    {#if inputHidden}{@render inputHidden(value)}{:else}
         <input {name} type="hidden" value={value ? JSON.stringify(value) : null} />
-    </slot>
+    {/if}
 
     {#if required && (!value || value.length === 0)}
-        <slot name="required" {value}>
-            <select class="required" required tabindex="-1" aria-hidden="true" />
-        </slot>
+        {#if requiredSnippet}{@render requiredSnippet(value)}{:else}
+            <select class="required" required tabindex="-1" aria-hidden="true"></select>
+        {/if}
     {/if}
 </div>
 
@@ -993,30 +921,6 @@
         opacity: var(--disabled-placeholder-opacity, 1);
     }
 
-    .selected-item {
-        position: relative;
-        overflow: var(--selected-item-overflow, hidden);
-        padding: var(--selected-item-padding, 0 20px 0 0);
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: var(--selected-item-color, inherit);
-        font-size: var(--font-size, 16px);
-    }
-
-    .multi .selected-item {
-        position: absolute;
-        line-height: var(--height, 42px);
-        height: var(--height, 42px);
-    }
-
-    .selected-item:focus {
-        outline: none;
-    }
-
-    .hide-selected-item {
-        opacity: 0;
-    }
-
     .icon {
         display: flex;
         align-items: center;
@@ -1084,128 +988,6 @@
         overflow: hidden;
         padding: 0px;
         white-space: nowrap;
-    }
-
-    .multi-item {
-        background: var(--multi-item-bg, #ebedef);
-        margin: var(--multi-item-margin, 0);
-        outline: var(--multi-item-outline, 1px solid #ddd);
-        border-radius: var(--multi-item-border-radius, 4px);
-        height: var(--multi-item-height, 25px);
-        line-height: var(--multi-item-height, 25px);
-        display: flex;
-        cursor: default;
-        padding: var(--multi-item-padding, 0 5px);
-        overflow: hidden;
-        gap: var(--multi-item-gap, 4px);
-        outline-offset: -1px;
-        max-width: var(--multi-max-width, none);
-        color: var(--multi-item-color, var(--item-color));
-    }
-
-    .multi-item.disabled:hover {
-        background: var(--multi-item-disabled-hover-bg, #ebedef);
-        color: var(--multi-item-disabled-hover-color, #c1c6cc);
-    }
-
-    .multi-item-text {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .multi-item-clear {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        --clear-icon-color: var(--multi-item-clear-icon-color, #000);
-    }
-
-    .multi-item.active {
-        outline: var(--multi-item-active-outline, 1px solid #006fe8);
-    }
-
-    .svelte-select-list {
-        box-shadow: var(--list-shadow, 0 2px 3px 0 rgba(44, 62, 80, 0.24));
-        border-radius: var(--list-border-radius, 4px);
-        max-height: var(--list-max-height, 252px);
-        overflow-y: auto;
-        background: var(--list-background, #fff);
-        position: var(--list-position, absolute);
-        z-index: var(--list-z-index, 2);
-        border: var(--list-border);
-    }
-
-    .prefloat {
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .list-group-title {
-        color: var(--group-title-color, #8f8f8f);
-        cursor: default;
-        font-size: var(--group-title-font-size, 16px);
-        font-weight: var(--group-title-font-weight, 600);
-        height: var(--height, 42px);
-        line-height: var(--height, 42px);
-        padding: var(--group-title-padding, 0 20px);
-        text-overflow: ellipsis;
-        overflow-x: hidden;
-        white-space: nowrap;
-        text-transform: var(--group-title-text-transform, uppercase);
-        border-width: var(--group-title-border-width, medium);
-        border-style: var(--group-title-border-style, none);
-        border-color: var(--group-title-border-color, color);
-    }
-
-    .empty {
-        text-align: var(--list-empty-text-align, center);
-        padding: var(--list-empty-padding, 20px 0);
-        color: var(--list-empty-color, #78848f);
-    }
-
-    .item {
-        cursor: default;
-        height: var(--item-height, var(--height, 42px));
-        line-height: var(--item-line-height, var(--height, 42px));
-        padding: var(--item-padding, 0 20px);
-        color: var(--item-color, inherit);
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        transition: var(--item-transition, all 0.2s);
-        align-items: center;
-        width: 100%;
-    }
-
-    .item.group-item {
-        padding-left: var(--group-item-padding-left, 40px);
-    }
-
-    .item:active {
-        background: var(--item-active-background, #b9daff);
-    }
-
-    .item.active {
-        background: var(--item-is-active-bg, #007aff);
-        color: var(--item-is-active-color, #fff);
-    }
-
-    .item.first {
-        border-radius: var(--item-first-border-radius, 4px 4px 0 0);
-    }
-
-    .item.hover:not(.active) {
-        background: var(--item-hover-bg, #e7f2ff);
-        color: var(--item-hover-color, inherit);
-    }
-
-    .item.not-selectable,
-    .item.hover.item.not-selectable,
-    .item.active.item.not-selectable,
-    .item.not-selectable:active {
-        color: var(--item-is-not-selectable-color, #999);
-        background: transparent;
     }
 
     .required {
