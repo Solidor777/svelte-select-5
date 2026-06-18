@@ -102,6 +102,10 @@
     let activeValue = $state();
     let listEl = $state();
 
+    // listOpen at init implies focused, seeded before the `!focused` close effect
+    // runs so an initially-open list is not immediately closed.
+    if (listOpen) focused = true;
+
     // Previous-cycle snapshots (mirror the original beforeUpdate lag).
     let prev_value;
     let prev_filterText;
