@@ -4,10 +4,10 @@
     import { HighlightSvelte } from 'svelte-highlight';
     import highlightStyles from 'svelte-highlight/styles/atom-one-dark';
 
-    const _props = import.meta.glob('./examples/props/*/*.svelte', { as: 'raw' });
-    const _slots = import.meta.glob('./examples/slots/*/*.svelte', { as: 'raw' });
-    const _events = import.meta.glob('./examples/events/*/*.svelte', { as: 'raw' });
-    const _advanced = import.meta.glob('./examples/advanced/*/*.svelte', { as: 'raw' });
+    const _props = import.meta.glob('./examples/props/*/*.svelte', { query: '?raw', import: 'default' });
+    const _slots = import.meta.glob('./examples/slots/*/*.svelte', { query: '?raw', import: 'default' });
+    const _events = import.meta.glob('./examples/events/*/*.svelte', { query: '?raw', import: 'default' });
+    const _advanced = import.meta.glob('./examples/advanced/*/*.svelte', { query: '?raw', import: 'default' });
 
     let source;
     let showNav = false;
