@@ -14,7 +14,6 @@
         getContainerWidth,
         onhover,
         onselect,
-        onListScroll,
         listEl = $bindable(undefined),
         listPrepend,
         listAppend,
@@ -44,7 +43,6 @@
         isScrollingTimer = setTimeout(() => {
             isScrolling = false;
         }, 100);
-        onListScroll?.();
     }
 
     function isItemActive(item) {
