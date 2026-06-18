@@ -4,11 +4,11 @@
 </div>
 
 <div align="center">
-  <a href="https://npmjs.org/package/@solidor777/svelte-select-5">
-    <img src="https://badgen.now.sh/npm/v/@solidor777/svelte-select-5" alt="version" />
+  <a href="https://npmjs.org/package/svelte-select-runes">
+    <img src="https://badgen.now.sh/npm/v/svelte-select-runes" alt="version" />
   </a>
-  <a href="https://npmjs.org/package/@solidor777/svelte-select-5">
-    <img src="https://badgen.now.sh/npm/dm/@solidor777/svelte-select-5" alt="downloads" />
+  <a href="https://npmjs.org/package/svelte-select-runes">
+    <img src="https://badgen.now.sh/npm/dm/svelte-select-runes" alt="downloads" />
   </a>
 </div>
 <div align="center">A select/autocomplete/typeahead Svelte component.</div>
@@ -22,7 +22,7 @@ and a [Show everything](src/routes/examples/advanced/show-everything/+page.svelt
 ## Installation
 
 ```bash
-npm install @solidor777/svelte-select-5
+npm install svelte-select-runes
 ```
 
 ## Svelte 5
@@ -133,7 +133,7 @@ Pass callbacks as props. Each receives its payload directly (no `event.detail`).
 
 ```html
 <script>
-  import Select from '@solidor777/svelte-select-5';
+  import Select from 'svelte-select-runes';
 
   let simple = ['one', 'two', 'three'];
 
@@ -153,7 +153,7 @@ They can also be grouped and include non-selectable items.
 
 ```html
 <script>
-  import Select from '@solidor777/svelte-select-5';
+  import Select from 'svelte-select-runes';
 
   const items = [
     {value: 'chocolate', label: 'Chocolate', group: 'Sweet'},
@@ -173,7 +173,7 @@ You can also use custom collections.
 
 ```html
 <script>
-  import Select from '@solidor777/svelte-select-5';
+  import Select from 'svelte-select-runes';
 
   const itemId = 'id';
   const label = 'title';
@@ -193,7 +193,7 @@ To load items asynchronously then `loadOptions` is the simplest solution. Supply
 
 ```html
 <script>
-  import Select from '@solidor777/svelte-select-5';
+  import Select from 'svelte-select-runes';
 
   import { someApiCall } from './services';
 
@@ -216,7 +216,7 @@ To load items asynchronously then `loadOptions` is the simplest solution. Supply
 
 ```html
 <script>
-  import Select from '@solidor777/svelte-select-5';
+  import Select from 'svelte-select-runes';
 
   let floatingConfig = {
     strategy: 'fixed'
@@ -314,7 +314,7 @@ deprecated.)
 
 ```svelte
 <script>
-  import Select from '@solidor777/svelte-select-5';
+  import Select from 'svelte-select-runes';
 </script>
 
 <!-- retheme via primitives -->
@@ -329,7 +329,7 @@ You can also use the `inputStyles` prop to write in any override styles needed f
 
 ```html
 <script>
-  import Select from '@solidor777/svelte-select-5';
+  import Select from 'svelte-select-runes';
 
   const items = ['One', 'Two', 'Three'];
 </script>

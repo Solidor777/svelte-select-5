@@ -1,5 +1,5 @@
 {
-  "name": "@solidor777/svelte-select-5",
+  "name": "svelte-select-runes",
   "version": "6.0.0",
   "repository": {
     "type": "git",
@@ -54,9 +54,6 @@
     "component"
   ],
   "type": "module",
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "dist"
   ],
