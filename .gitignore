@@ -6,6 +6,7 @@ node_modules
 /spec/page/public/build
 /.svelte-kit
 /package
+/dist
 /src/lib/no-styles
 .env
 /.claude

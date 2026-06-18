@@ -1,6 +1,6 @@
 {
   "name": "svelte-select",
-  "version": "5.8.3",
+  "version": "6.0.0",
   "repository": "https://rob-balfre@github.com/rob-balfre/svelte-select.git",
   "description": "A <Select> component for Svelte apps",
   "scripts": {
@@ -40,11 +40,23 @@
     "svelte"
   ],
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "svelte": "./index.js",
-      "types": "./index.d.ts"
-    }
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    },
+    "./styles/tokens.css": "./dist/styles/tokens.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "svelte": "^5"
   },
   "dependencies": {
     "svelte-floating-ui": "^1.6.2"

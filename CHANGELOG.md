@@ -1,5 +1,29 @@
 # svelte-select changelog
 
+## 6.0.0
+
+Major release: **Svelte 5 runes rewrite** + a layered CSS token system. See
+`MIGRATION_GUIDE.md` for the full upgrade path. ⚠️ BREAKING CHANGES.
+
+* Requires **Svelte 5**. Component rewritten with runes (`$props`, `$state`,
+  `$derived`, `$effect`, `$bindable`).
+* **Events → callback props:** `on:change`/`select`/`input`/`clear`/`focus`/
+  `blur`/`hoverItem`/`filter`/`loaded`/`error` are now `onchange`, `onselect`,
+  `oninput`, `onclear`, `onfocus`, `onblur`, `onhoveritem`, `onfilter`,
+  `onloaded`, `onerror`. Payloads are passed directly (no `event.detail`).
+* **Slots → snippets:** all named slots are now snippet props (`item`,
+  `selection`, `empty`, `list`, `prepend`, `chevronIcon`, …; the `required` slot
+  is now `requiredSnippet`).
+* **Layered CSS tokens:** new `--svelte-select-*` token system (Tier 1
+  primitives → Tier 2 part tokens). Override a few primitives to retheme
+  everything. Built-in dark mode via `data-theme="dark"`. Legacy flat variables
+  still work but are deprecated; camelCase variables (deprecated in v5) removed.
+* Component decomposed into `Select` + `List`/`Item`/`SingleSelection`/
+  `MultiSelection` and rune logic modules; all internal, public entry unchanged.
+* `getItems` prop signature now uses `onError`/`onLoaded` callbacks.
+* Tooling: Vite 8 / SvelteKit 2 / `@sveltejs/package` 2; tests on Vitest +
+  Testing Library + Playwright. Package now publishes from `dist/`.
+
 ## 5.8.3
 
 * #651 Fixed: unknown extension .svelte (thanks to @happysalada)
