@@ -111,3 +111,60 @@ test('Tab/Enter on a selectable:false hovered item does not select (case 177, 17
     await tick();
     expect(onselect).not.toHaveBeenCalled();
 });
+
+test('clicking an item with selectable:true selects it (case 63)', async () => {
+    const onselect = vi.fn();
+    const sel = [{ value: 'x', label: 'X', selectable: true }];
+    const { getByText } = render(Select, { props: { items: sel, listOpen: true, focused: true, onselect } });
+    await fireEvent.click(getByText('X'));
+    await tick();
+    expect(onselect).toHaveBeenCalled();
+});
+
+test('clicking an item with selectable unspecified selects it (case 62)', async () => {
+    const onselect = vi.fn();
+    const { getByText } = render(Select, { props: { items, listOpen: true, focused: true, onselect } });
+    await fireEvent.click(getByText('Pizza'));
+    await tick();
+    expect(onselect).toHaveBeenCalledWith(items[1]);
+});
+
+test('multiple + filterText with no matches: Enter selects nothing (case 104)', async () => {
+    const onselect = vi.fn();
+    const { container } = render(Select, {
+        props: { multiple: true, items, focused: true, filterText: 'zzzz', listOpen: true, onselect },
+    });
+    await key(container, 'Enter');
+    await tick();
+    expect(onselect).not.toHaveBeenCalled();
+    expect(container.querySelectorAll('.multi-item')).toHaveLength(0);
+});
+
+test('one non-selectable filtered item: Enter selects nothing; a selectable filter then selects (case 179)', async () => {
+    const onselect = vi.fn();
+    const list = [
+        { value: 'pizza', label: 'Pizza' },
+        { value: 'cake', label: 'Cake', selectable: false },
+    ];
+    const { container, rerender } = render(Select, {
+        props: { items: list, listOpen: true, focused: true, filterText: 'cake', onselect },
+    });
+    await key(container, 'ArrowDown');
+    await key(container, 'Enter');
+    await tick();
+    expect(onselect).not.toHaveBeenCalled();
+    await rerender({ items: list, listOpen: true, focused: true, filterText: 'piz', onselect });
+    await key(container, 'Enter');
+    await tick();
+    expect(onselect).toHaveBeenCalledWith(expect.objectContaining({ value: 'pizza' }));
+});
+
+test('no selectable filtered items: Enter selects nothing (case 180)', async () => {
+    const onselect = vi.fn();
+    const list = [{ value: 'cake', label: 'Cake', selectable: false }];
+    const { container } = render(Select, { props: { items: list, listOpen: true, focused: true, onselect } });
+    await key(container, 'ArrowDown');
+    await key(container, 'Enter');
+    await tick();
+    expect(onselect).not.toHaveBeenCalled();
+});

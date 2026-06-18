@@ -65,6 +65,20 @@ test('programmatic value change does not fire change (case 163)', async () => {
     expect(onchange).not.toHaveBeenCalled();
 });
 
+test('multiple: input fires on every removal including the last (case 142)', async () => {
+    const oninput = vi.fn();
+    const { container } = render(Select, {
+        props: { multiple: true, items, value: [items[2], items[3]], oninput },
+    });
+    oninput.mockClear();
+    await fireEvent.pointerUp(container.querySelector('.multi-item-clear'));
+    await tick();
+    await fireEvent.pointerUp(container.querySelector('.multi-item-clear'));
+    await tick();
+    expect(oninput).toHaveBeenCalledTimes(2);
+    expect(container.querySelectorAll('.multi-item')).toHaveLength(0);
+});
+
 test('filtering fires onfilter while list open (case 176)', async () => {
     const onfilter = vi.fn();
     const { container } = render(Select, { props: { items, listOpen: true, onfilter } });

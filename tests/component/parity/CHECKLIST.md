@@ -29,7 +29,7 @@ Status filled as ported.
 | 14 | clear wipes value and updates view | C | view.test |
 | 15 | clicking on Select opens list | U | select-core.test |
 | 16 | Select opens list populated with items | C | view.test |
-| 17 | list starts with first item in hover state | C | list.test (U) |
+| 17 | list starts with first item in hover state | C | hover.test |
 | 18 | select item from list | U | select-core.test |
 | 19 | placement top: list above input | E | select.spec |
 | 20 | placement bottom: list below input | E | select.spec |
@@ -63,7 +63,7 @@ Status filled as ported.
 | 48 | two-way binding Select<->parent | C | binding.test |
 | 49 | ellipsis for overflowing list item text | E | select.spec |
 | 50 | focusing external textarea closes/blurs | E | select.spec |
-| 51 | if only one item it has hover state | C | list.test (U) |
+| 51 | if only one item it has hover state | C | hover.test |
 | 52 | hovered item in filtered list shows hover | C | filter.test |
 | 53 | data not stripped from item | C | view.test |
 | 54 | cannot clear when clearing disabled | C | view.test |
@@ -212,11 +212,12 @@ cases with component logic:
   closes/blurs the prior Select), 112 (listAutoWidth=false), 172 (`--item-height`
   CSS var applies).
 
-The remaining e2e-bucket cases are pure CSS or floating-ui pass-throughs with no
-component logic of their own, so they carry low regression risk and are covered by
-the mechanism above rather than individually asserted:
+The remaining e2e-bucket cases are deferred because jsdom cannot measure layout or
+scroll. They carry low regression risk for the reasons noted:
 
-- 6, 7 (scroll active/hovered into view) — delegated to `scrollIntoView` (guarded).
+- 6, 7 (scroll active/hovered into view) — **browser-only logic, not asserted**:
+  List.svelte's `scrollAction` update guard drives `scrollIntoView` (guarded), which
+  jsdom does not implement. Genuinely untested, not CSS-covered.
 - 19 (placement top), 137 (listOffset) — `floatingConfig` passed straight to
   floating-ui; 20 verifies the integration is wired.
 - 49 (ellipsis), 76 (multi wrap height) — pure CSS (`text-overflow`, `flex-wrap`).

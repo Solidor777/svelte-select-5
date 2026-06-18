@@ -31,13 +31,11 @@ test('typing hides the selected item view (case 30)', async () => {
     expect(container.querySelector('.selected-item.hide-selected-item')).not.toBeNull();
 });
 
-test('the first filtered item receives hover (case 42, 96)', async () => {
-    const { container, getByText } = render(Select, { props: { items, focused: true } });
-    await fireEvent.input(container.querySelector('input'), { target: { value: 'a' } });
-    // first match (Chocolate or Cake contains 'a'? Chocolate has no 'a'; Cake/pizza? pizza no) -> Cake
-    const firstItem = container.querySelector('.item');
-    expect(firstItem).toHaveClass('hover');
-    expect(getByText('Cake')).toBeInTheDocument();
+test('hover tracks the top filtered item by identity (case 42, 96)', async () => {
+    const { container } = render(Select, { props: { items, focused: true } });
+    await fireEvent.input(container.querySelector('input'), { target: { value: 'piz' } });
+    const hovered = container.querySelector('.item.hover');
+    expect(hovered.textContent.trim()).toBe('Pizza');
 });
 
 test('closing the list clears filterText (case 32, 34)', async () => {

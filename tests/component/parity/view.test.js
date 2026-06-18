@@ -131,6 +131,20 @@ test('items change updates the displayed value label (case 122, 123)', async () 
     expect(getByText('Dark Chocolate')).toBeInTheDocument();
 });
 
+test('items change keeps the value when its itemId is not found in new items (case 123)', async () => {
+    const { getByText, rerender } = render(Select, { props: { items, value: { value: 'chips', label: 'Chips' } } });
+    await rerender({
+        items: [{ value: 'loaded-fries', label: 'Loaded Fries' }, ...items],
+        value: { value: 'chips', label: 'Chips' },
+    });
+    // 'chips' is still present here; remove it to exercise the not-found branch
+    await rerender({
+        items: [{ value: 'loaded-fries', label: 'Loaded Fries' }],
+        value: { value: 'chips', label: 'Chips' },
+    });
+    expect(getByText('Chips')).toBeInTheDocument();
+});
+
 test('clicking toggles the list open and closed (case 38)', async () => {
     const { container } = render(Select, { props: { items } });
     const control = container.querySelector('.svelte-select');

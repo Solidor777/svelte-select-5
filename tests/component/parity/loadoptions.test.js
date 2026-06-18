@@ -46,3 +46,66 @@ test('loadOptions + initial value renders the value (case 189)', () => {
     const { getByText } = render(Select, { props: { loadOptions: async () => loaded, value: { value: 'a', label: 'Apple' } } });
     expect(getByText('Apple')).toBeInTheDocument();
 });
+
+test('loadOptions + items closes the list on blur (case 126)', async () => {
+    const { container } = render(Select, {
+        props: { items: loaded, loadOptions: async () => loaded, listOpen: true, focused: true },
+    });
+    await fireEvent.blur(container.querySelector('input'));
+    expect(container.querySelector('.svelte-select-list')).toBeNull();
+});
+
+test('loadOptions populates the open list on resolve (case 135)', async () => {
+    const { container, findByText } = render(Select, {
+        props: { loadOptions: async () => loaded, value: { value: 'a', label: 'Apple' }, debounce, listOpen: true, focused: true },
+    });
+    await fireEvent.input(container.querySelector('input'), { target: { value: 'ban' } });
+    expect(await findByText('Banana')).toBeInTheDocument();
+});
+
+test('loadOptions + multiple + value keeps filterText after resolve (case 136)', async () => {
+    const { container } = render(Select, {
+        props: {
+            multiple: true,
+            value: { value: 'x', label: 'X' },
+            listOpen: true,
+            filterText: 'test',
+            loadOptions: async () => loaded,
+            debounce,
+            focused: true,
+        },
+    });
+    await tick();
+    expect(container.querySelector('input').value).toBe('test');
+});
+
+test('loadOptions + groupBy shows group headers (case 161)', async () => {
+    const groupedLoaded = [
+        { value: 'a', label: 'Apple', group: 'Sweet' },
+        { value: 'p', label: 'Potato', group: 'Savory' },
+    ];
+    const { container, findByText } = render(Select, {
+        props: { loadOptions: async () => groupedLoaded, groupBy: (i) => i.group, debounce, listOpen: true, focused: true },
+    });
+    await fireEvent.input(container.querySelector('input'), { target: { value: 'potato' } });
+    await findByText('Potato');
+    const titles = [...container.querySelectorAll('.list-group-title')].map((n) => n.textContent.trim());
+    expect(titles).toContain('Savory');
+});
+
+test('loadOptions + groupBy does not duplicate group titles across filters (case 188)', async () => {
+    const groupedLoaded = [
+        { value: 'a', label: 'Apple', group: 'Sweet' },
+        { value: 'c', label: 'Cream', group: 'Sweet' },
+    ];
+    const loadOptions = async () => groupedLoaded;
+    const { container } = render(Select, {
+        props: { loadOptions, groupBy: (i) => i.group, debounce, listOpen: true, focused: true },
+    });
+    await fireEvent.input(container.querySelector('input'), { target: { value: 'cre' } });
+    await tick();
+    expect(container.querySelectorAll('.list-group-title')).toHaveLength(1);
+    await fireEvent.input(container.querySelector('input'), { target: { value: 'cr' } });
+    await tick();
+    expect(container.querySelectorAll('.list-group-title')).toHaveLength(1);
+});
