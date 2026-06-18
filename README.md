@@ -28,7 +28,11 @@ npm install svelte-select
 ```
 
 ## Svelte 5
-I'm not currently using Svelte 5 in my day job or personal projects so might be a while before I tackle porting / upgrading to Svelte 5. Looking forward to it though, just need to find the time!
+v6 is a Svelte 5 runes rewrite and **requires Svelte 5**. Events are now callback
+props (`onchange`, `onselect`, …) and slots are now snippets. Theming uses a
+layered `--svelte-select-*` token system (old flat variables still work but are
+deprecated). See the [migration guide](/MIGRATION_GUIDE.md). For Svelte 3/4, use
+svelte-select v5.
 
 
 ## Upgrading Svelte Select
@@ -75,45 +79,54 @@ List position and floating is powered by `floating-ui`, see their [package-entry
 | name                   | `string`  | `null`          | Name attribute of hidden input, helpful for form actions       |
 | required               | `boolean` | `false`         | If `Select` is within a `<form>` will restrict form submission |
 | multiFullItemClearable | `boolean` | `false`         | When `multiple` selected items will clear on click             |
-| closeListOnChange      | `boolean` | `true`          | After `on:change` list will close                              |
-| clearFilterTextOnBlur  | `boolean` | `true`          | If `false`, `filterText` value is preserved on:blur            |
+| closeListOnChange      | `boolean` | `true`          | After a change the list will close                             |
+| clearFilterTextOnBlur  | `boolean` | `true`          | If `false`, `filterText` value is preserved on blur            |
 
 
-## Named slots
+## Snippets
+
+Customise any part with a [snippet](https://svelte.dev/docs/svelte/snippet). All
+are optional; defaults are used when omitted.
 
 ```svelte
-<Select>
-  <div slot="prepend" />
-  <div slot="selection" let:selection let:index /> <!-- index only available when multiple -->
-  <div slot="clear-icon" />  
-  <div slot="multi-clear-icon" />  
-  <div slot="loading-icon" />  
-  <div slot="chevron-icon" /> 
-  <div slot="list-prepend" />  
-  <div slot="list" let:filteredItems />  
-  <div slot="list-append" />  
-  <div slot="item" let:item let:index />  
-  <div slot="input-hidden" let:value />
-  <div slot="required" let:value />
-  <!-- Remember you can also use `svelte:fragment` to avoid a container DOM element. -->
-  <svelte:fragment slot="empty" />  
+<Select {items}>
+  {#snippet prepend()}…{/snippet}
+  {#snippet selection(selection, index)}{selection.label}{/snippet}
+  {#snippet clearIcon()}…{/snippet}
+  {#snippet multiClearIcon()}…{/snippet}
+  {#snippet loadingIcon()}…{/snippet}
+  {#snippet chevronIcon(listOpen)}…{/snippet}
+  {#snippet listPrepend()}…{/snippet}
+  {#snippet list(filteredItems)}…{/snippet}
+  {#snippet listAppend()}…{/snippet}
+  {#snippet item(item, index)}{item.label}{/snippet}
+  {#snippet empty()}No options{/snippet}
+  {#snippet inputHidden(value)}…{/snippet}
+  {#snippet requiredSnippet(value)}…{/snippet}
 </Select>
 ```
 
 
-## Events
+## Events (callback props)
 
-| Event Name | Callback          | Description                                                                |
-| ---------- | ----------------- | -------------------------------------------------------------------------- |
-| change     | { detail }        | fires when the user selects an option                                      |
-| input      | { detail }        | fires when the value has been changed                                      |
-| focus      | { detail }        | fires when select > input on:focus                                         |
-| blur       | { detail }        | fires when select > input on:blur                                          |
-| clear      | { detail }        | fires when clear is invoked or item is removed (by user) from multi select |
-| loaded     | { options }       | fires when `loadOptions` resolves                                          |
-| error      | { type, details } | fires when error is caught                                                 |
-| filter     | { detail }        | fires when `listOpen: true` and items are filtered                         |
-| hoverItem  | { detail }        | fires when hoverItemIndex changes                                          |
+Pass callbacks as props. Each receives its payload directly (no `event.detail`).
+
+| Prop          | Payload           | Description                                                                |
+| ------------- | ----------------- | -------------------------------------------------------------------------- |
+| `onchange`    | value             | fires when the user selects an option                                      |
+| `onselect`    | selection         | fires when an option is selected                                           |
+| `oninput`     | value             | fires when the value has changed                                           |
+| `onfocus`     | FocusEvent        | fires when select > input focuses                                          |
+| `onblur`      | FocusEvent        | fires when select > input blurs                                            |
+| `onclear`     | removed item(s)   | fires when clear is invoked or an item is removed from a multi select      |
+| `onloaded`    | { items }         | fires when `loadOptions` resolves                                          |
+| `onerror`     | { type, details } | fires when an error is caught                                              |
+| `onfilter`    | items             | fires when `listOpen: true` and items are filtered                         |
+| `onhoveritem` | index             | fires when hoverItemIndex changes                                          |
+
+```svelte
+<Select {items} onchange={(value) => console.log(value)} />
+```
 
 
 ### Items
@@ -294,17 +307,25 @@ export let ariaFocused = () => {
 }
 ```
 
-## CSS custom properties (variables)
+## CSS custom properties (tokens)
 
-You can style a component by overriding [the available CSS custom properties](/docs/theming_variables.md).
+Style the component with the layered [`--svelte-select-*` token system](/docs/theming_variables.md).
+Override a few Tier 1 primitives to retheme everything, or target individual
+parts. (The old flat variables like `--border-radius` still work but are
+deprecated.)
 
-```html
+```svelte
 <script>
   import Select from 'svelte-select';
 </script>
 
-<Select --border-radius= "10px" --placeholder-color="blue" />
+<!-- retheme via primitives -->
+<Select --svelte-select-radius="10px" --svelte-select-accent="rebeccapurple" />
 ```
+
+### Dark mode
+
+Set `data-theme="dark"` on the `.svelte-select` element or any ancestor.
 
 You can also use the `inputStyles` prop to write in any override styles needed for the input.
 
@@ -318,8 +339,12 @@ You can also use the `inputStyles` prop to write in any override styles needed f
 <Select {items} inputStyles="box-sizing: border-box;"></Select>
 ```
 
-### 🧪 Experimental: Replace styles (Tailwind, Bootstrap, Bulma etc)
-If you'd like to supply your own styles use: `import Select from 'svelte-select/no-styles/Select.svelte'`. Then somewhere in your code or build pipeline add your own. There is a tailwind stylesheet via `import 'svelte-select/tailwind.css'`. It uses `@extend` so PostCSS is required.
+### Replacing styles
+
+The component's styles are token-driven, so most theming is done via the
+`--svelte-select-*` tokens above (and `data-theme="dark"`). To go further, target
+the component's class names (`.svelte-select`, `.svelte-select-list`, `.item`,
+`.multi-item`, …) with your own global CSS.
 
 
 ## License

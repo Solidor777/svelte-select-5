@@ -1,3 +1,100 @@
+## Migrating from v5 to v6 (Svelte 5)
+
+v6 requires **Svelte 5** and is a runes rewrite. It includes ⚠️ BREAKING CHANGES ⚠️.
+
+### Events → callback props
+
+`createEventDispatcher` events are gone; pass callback props instead.
+
+| v5 event | v6 prop | Payload |
+|---|---|---|
+| `on:change` | `onchange` | selected value |
+| `on:select` | `onselect` | selection |
+| `on:input` | `oninput` | value |
+| `on:clear` | `onclear` | removed item(s) |
+| `on:focus` | `onfocus` | FocusEvent |
+| `on:blur` | `onblur` | FocusEvent |
+| `on:hoverItem` | `onhoveritem` | index |
+| `on:filter` | `onfilter` | items |
+| `on:error` | `onerror` | `{ type, details }` |
+| `on:loaded` | `onloaded` | `{ items }` |
+
+Payloads are passed directly — there is no `event.detail` wrapper.
+
+```svelte
+<!-- v5 -->
+<Select {items} on:change={(e) => handle(e.detail)} />
+
+<!-- v6 -->
+<Select {items} onchange={(value) => handle(value)} />
+```
+
+### Slots → snippets
+
+Named slots become snippet props. Default content is preserved when a snippet
+isn't supplied. `let:` slot props become snippet parameters.
+
+| v5 slot | v6 snippet | Parameters |
+|---|---|---|
+| `slot="prepend"` | `{#snippet prepend()}` | — |
+| `slot="selection"` | `{#snippet selection(selection, index)}` | selection, index |
+| `slot="clear-icon"` | `{#snippet clearIcon()}` | — |
+| `slot="multi-clear-icon"` | `{#snippet multiClearIcon()}` | — |
+| `slot="loading-icon"` | `{#snippet loadingIcon()}` | — |
+| `slot="chevron-icon"` | `{#snippet chevronIcon(listOpen)}` | listOpen |
+| `slot="list"` | `{#snippet list(filteredItems)}` | filteredItems |
+| `slot="list-prepend"` | `{#snippet listPrepend()}` | — |
+| `slot="list-append"` | `{#snippet listAppend()}` | — |
+| `slot="item"` | `{#snippet item(item, index)}` | item, index |
+| `slot="empty"` | `{#snippet empty()}` | — |
+| `slot="input-hidden"` | `{#snippet inputHidden(value)}` | value |
+| `slot="required"` | `{#snippet requiredSnippet(value)}` | value |
+
+```svelte
+<!-- v5 -->
+<Select {items} on:select={handleSelect}>
+  <div slot="item" let:item>{item.label}</div>
+</Select>
+
+<!-- v6 -->
+<Select {items} onselect={handleSelect}>
+  {#snippet item(item)}<div>{item.label}</div>{/snippet}
+</Select>
+```
+
+> Note: the `required` slot is now the `requiredSnippet` prop (the `required`
+> boolean prop is unchanged).
+
+### Two-way binding
+
+`value`, `filterText`, `listOpen`, `focused`, `hoverItemIndex`, `justValue`,
+`items`, and `loading` are `bind:`-able as before (now backed by `$bindable`).
+
+### CSS: layered tokens
+
+Theming now uses a layered `--svelte-select-*` token system. Override a few
+**Tier 1 primitives** (e.g. `--svelte-select-accent`, `--svelte-select-bg`,
+`--svelte-select-border-color`, `--svelte-select-radius`) to retheme everything,
+or target individual part tokens. See `docs/theming_variables.md` for the full
+list.
+
+The old flat variables (`--background`, `--item-hover-bg`, …) **still work** but
+are **deprecated** and will be removed in a future major — prefer the
+`--svelte-select-*` tokens. The camelCase variables (`--borderRadius`, …),
+deprecated since v5, are removed in v6.
+
+### Dark mode
+
+Set `data-theme="dark"` on the `.svelte-select` element or any ancestor.
+
+### `getItems` prop
+
+If you passed a custom `getItems`, its signature changed: it now receives
+`{ loadOptions, filterText, convertStringItemsToObjects, onError, onLoaded }`
+(callbacks) instead of a `dispatch` function.
+
+---
+
 ## Migrating for v4 to v5
 
 v5 is a major release that that includes some ⚠️ BREAKING CHANGES ⚠️ 
